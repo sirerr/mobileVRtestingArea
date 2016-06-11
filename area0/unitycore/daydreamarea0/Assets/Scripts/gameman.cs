@@ -23,8 +23,7 @@ public class gameman : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		maincontroller.transform.rotation = GvrController.Orientation;
-
+		
 	}
 
 	// Update is called once per frame
