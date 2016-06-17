@@ -4,21 +4,44 @@ using Gvr.Internal;
 
 public class controllermovement : MonoBehaviour {
 
-	public Vector3 controllaccel;
+	private Vector3 controllaccel;
 	public float speed =0;
 	public GameObject emitpointobj;
 	public GameObject ballonobj;
-
+	public GameObject fanpivotobj;
 	private GameObject currentballon;
-	public float ballonsize =0;
-	public Vector3 startsize;
+
+
+	private Vector3 startsize;
+	public float sizeincspeed =0;
+
+	private float sizecounter =0;
+	public float finalsizecounter =0;
+	public float sizecounterinc =0;
+
+	private Vector3 currentballonsize;
 	public bool appbuttonpress = false;
 
 	public bool okaytomakeballon = true;
+	public bool letlooseballon = false;
+	public bool letgo = false;
+
+	public float ballonforcey =0;
+
+	//controller touchpad
+	public Vector2 touchpadloc;
+	public bool firsttouch = false;
+
+	//fan obj
+	public GameObject fanobj;
+	public Vector3 fandefaultrotation;
+	public Vector3 fancurrentrotation;
 
 	void Awake()
 	{
 		GvrViewer.Create();
+		fandefaultrotation = fanobj.transform.rotation.eulerAngles;
+	
 	}
 	// Use this for initialization
 	void Start () {
@@ -36,9 +59,53 @@ public class controllermovement : MonoBehaviour {
 
 	void Update()
 	{
-
+		fancurrentrotation = fanobj.transform.rotation.eulerAngles;
+		//take button and make ballon
 		appbuttonpress = GvrController.AppButton;
-		// take button press and make ballon
+		// touch pad location;
+		touchpadloc = GvrController.TouchPos;
+
+	
+		//touchpad code
+		fanobj.transform.position = fanpivotobj.transform.position;
+		float xtouchvalue = touchpadloc.x *100f;
+		float ytouchvalue = touchpadloc.y *100f;
+
+		if(GvrController.TouchDown)
+		{
+			firsttouch = true;
+		}
+
+		//code needs to be fixed!!!
+
+		if(xtouchvalue<50 && firsttouch)
+		{
+			fancurrentrotation.x = 310f + xtouchvalue;
+			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
+
+
+		}else if (xtouchvalue>51 && xtouchvalue<=100 && firsttouch)
+		{
+
+			fancurrentrotation.x = xtouchvalue -51;
+			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
+		}
+
+		if(ytouchvalue<50 && firsttouch)
+		{
+			fancurrentrotation.y = 310f + ytouchvalue;
+			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
+
+
+		}else if (ytouchvalue>51 && ytouchvalue<=100 && firsttouch)
+		{
+
+			fancurrentrotation.y = ytouchvalue -51;
+			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
+		}
+
+
+		//touchpad code
 
 		if(appbuttonpress)
 		{
@@ -46,20 +113,45 @@ public class controllermovement : MonoBehaviour {
 			{
 				currentballon = Instantiate(ballonobj,emitpointobj.transform.position,emitpointobj.transform.rotation) as GameObject;
 				okaytomakeballon = false;
-				currentballon.transform.SetParent(emitpointobj.transform);
+				currentballon.transform.position = emitpointobj.transform.position;
+				startsize = currentballon.transform.localScale;
+				currentballonsize = startsize;
 			}
-			startsize = currentballon.transform.localScale;
-			print(startsize.x + ballonsize);
-			if(startsize.x > startsize.x +ballonsize)
-			{ 
-				print(startsize.x + ballonsize);
-					startsize += new Vector3(startsize.x + .1f,startsize.y +.1f,startsize.z +.1f);
-				currentballon.transform.localScale = startsize;
+
+
+			if(sizecounter<finalsizecounter)
+			{
+				sizecounter+=sizecounterinc;
+				currentballonsize.x = currentballonsize.x + (sizeincspeed * Time.deltaTime);
+				currentballonsize.y = currentballonsize.y + (sizeincspeed * Time.deltaTime);
+				currentballonsize.z = currentballonsize.z + ((sizeincspeed )* Time.deltaTime);
+				currentballon.transform.localScale = currentballonsize;
+
+			}
+			else
+			{
+				letlooseballon = true;
+			}
+
+			if(!letgo && letlooseballon)
+			{
+				letlooseballon = false;
+				Rigidbody rbody = currentballon.GetComponent<Rigidbody>();
+				rbody.AddForce(Vector3.up * ballonforcey);
+				gameman.gamemanref.liveballons.Add(currentballon);
+				currentballon = null;
+				//keeps count in the list of the ballon location
+				gameman.gamemanref.balloncounter++;
+				gameman.gamemanref.liveballoncount++;
+				letgo = true;
 			}
 
 		}
 
-
+		if(currentballon !=null)
+		{
+			currentballon.transform.position = emitpointobj.transform.position;	
+		}
 
 		//print("pressing app button");
 	}
