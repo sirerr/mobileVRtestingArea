@@ -482,6 +482,7 @@ MonoBehaviour:
   emitpointobj: {fileID: 1425463152}
   ballonobj: {fileID: 105346, guid: a137c26d561f60741865e7b6f38cbf6b, type: 2}
   fanpivotobj: {fileID: 1738034621}
+  currentballon: {fileID: 0}
   sizeincspeed: 3
   finalsizecounter: 15
   sizecounterinc: 0.2
@@ -489,11 +490,9 @@ MonoBehaviour:
   okaytomakeballon: 1
   letlooseballon: 0
   letgo: 0
-  ballonforcey: 7
   touchpadloc: {x: 0, y: 0}
   firsttouch: 0
   fanobj: {fileID: 1347077210}
-  fandefaultrotation: {x: 0, y: 0, z: 0}
   fancurrentrotation: {x: 0, y: 0, z: 0}
 --- !u!1 &1198625768
 GameObject:
@@ -630,6 +629,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1347077211}
+  - 114: {fileID: 1347077212}
   m_Layer: 0
   m_Name: fanpivotobj
   m_TagString: Untagged
@@ -651,6 +651,21 @@ Transform:
   - {fileID: 1643745858}
   m_Father: {fileID: 0}
   m_RootOrder: 7
+--- !u!114 &1347077212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1347077210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02d93387737cacc4ba6e3dc9cb1cd730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  touchingpad: 0
+  raydis: 100
+  ballondirection: {x: 0, y: 0, z: 0}
+  objtag: ballon
 --- !u!1 &1425463152
 GameObject:
   m_ObjectHideFlags: 0

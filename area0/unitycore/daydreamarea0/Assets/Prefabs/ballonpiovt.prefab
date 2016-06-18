@@ -9,6 +9,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 482718}
   - 54: {fileID: 5421904}
+  - 114: {fileID: 11490686}
   m_Layer: 0
   m_Name: ballonpiovt
   m_TagString: ballon
@@ -105,8 +106,21 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &11490686
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 105346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2c17735fda22b745b5716876d727058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rbody: {fileID: 0}
+  ballonforcey: 10
 --- !u!135 &13532714
 SphereCollider:
   m_ObjectHideFlags: 1

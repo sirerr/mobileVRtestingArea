@@ -9,7 +9,7 @@ public class controllermovement : MonoBehaviour {
 	public GameObject emitpointobj;
 	public GameObject ballonobj;
 	public GameObject fanpivotobj;
-	private GameObject currentballon;
+	public GameObject currentballon;
 
 
 	private Vector3 startsize;
@@ -26,26 +26,25 @@ public class controllermovement : MonoBehaviour {
 	public bool letlooseballon = false;
 	public bool letgo = false;
 
-	public float ballonforcey =0;
-
 	//controller touchpad
 	public Vector2 touchpadloc;
 	public bool firsttouch = false;
 
 	//fan obj
 	public GameObject fanobj;
-	public Vector3 fandefaultrotation;
+	private Vector3 fandefaultrotation;
 	public Vector3 fancurrentrotation;
 
 	void Awake()
 	{
-		GvrViewer.Create();
+		
 		fandefaultrotation = fanobj.transform.rotation.eulerAngles;
 	
 	}
 	// Use this for initialization
 	void Start () {
 		speed = speed * Time.deltaTime;
+		GvrViewer.Create();
 	}
 	
 	// Update is called once per frame
@@ -76,34 +75,36 @@ public class controllermovement : MonoBehaviour {
 			firsttouch = true;
 		}
 
-		//code needs to be fixed!!!
+		//touchpad code
+		if(firsttouch)
+		fanobj.transform.rotation = Quaternion.Euler(touchpadloc.y * 100 - 50, touchpadloc.x * 100 - 50, fanobj.transform.rotation.z);
 
-		if(xtouchvalue<50 && firsttouch)
-		{
-			fancurrentrotation.x = 310f + xtouchvalue;
-			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
-
-
-		}else if (xtouchvalue>51 && xtouchvalue<=100 && firsttouch)
-		{
-
-			fancurrentrotation.x = xtouchvalue -51;
-			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
-		}
-
-		if(ytouchvalue<50 && firsttouch)
-		{
-			fancurrentrotation.y = 310f + ytouchvalue;
-			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
-
-
-		}else if (ytouchvalue>51 && ytouchvalue<=100 && firsttouch)
-		{
-
-			fancurrentrotation.y = ytouchvalue -51;
-			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
-		}
-
+		//test code
+//		if(xtouchvalue<50 && firsttouch)
+//		{
+//			fancurrentrotation.x = 310f + xtouchvalue;
+//			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
+//
+//
+//		}else if (xtouchvalue>51 && xtouchvalue<=100 && firsttouch)
+//		{
+//
+//			fancurrentrotation.x = xtouchvalue -51;
+//			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
+//		}
+//
+//		if(ytouchvalue<50 && firsttouch)
+//		{
+//			fancurrentrotation.y = 310f + ytouchvalue;
+//			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
+//
+//
+//		}else if (ytouchvalue>51 && ytouchvalue<=100 && firsttouch)
+//		{
+//
+//			fancurrentrotation.y = ytouchvalue -51;
+//			fanobj.transform.rotation = Quaternion.Euler(fancurrentrotation);
+//		}
 
 		//touchpad code
 
@@ -119,7 +120,7 @@ public class controllermovement : MonoBehaviour {
 			}
 
 
-			if(sizecounter<finalsizecounter)
+			if(sizecounter<finalsizecounter && currentballon!=null)
 			{
 				sizecounter+=sizecounterinc;
 				currentballonsize.x = currentballonsize.x + (sizeincspeed * Time.deltaTime);
@@ -128,22 +129,25 @@ public class controllermovement : MonoBehaviour {
 				currentballon.transform.localScale = currentballonsize;
 
 			}
-			else
+			else if (sizecounter>finalsizecounter)
 			{
 				letlooseballon = true;
+				letgo =false;
 			}
 
 			if(!letgo && letlooseballon)
 			{
 				letlooseballon = false;
-				Rigidbody rbody = currentballon.GetComponent<Rigidbody>();
-				rbody.AddForce(Vector3.up * ballonforcey);
+				letgo = true;
+				sizecounter = 0;
+				currentballon.SendMessage("letgo");
 				gameman.gamemanref.liveballons.Add(currentballon);
 				currentballon = null;
 				//keeps count in the list of the ballon location
 				gameman.gamemanref.balloncounter++;
 				gameman.gamemanref.liveballoncount++;
-				letgo = true;
+
+				StartCoroutine(makenewballon());
 			}
 
 		}
@@ -155,4 +159,10 @@ public class controllermovement : MonoBehaviour {
 
 		//print("pressing app button");
 	}
+
+	IEnumerator makenewballon()
+	{
+		yield return new WaitForSeconds (.5f);
+		okaytomakeballon = true;
+		}
 }
