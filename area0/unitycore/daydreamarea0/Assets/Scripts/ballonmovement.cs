@@ -27,7 +27,8 @@ public class ballonmovement : MonoBehaviour {
 	public void direction()
 	{
 		rbody.AddForce(newdirection *addforce);
-
+		print(newdirection);
+		print("hitting ballon!!");
 	}
 
 	public void letgo()
