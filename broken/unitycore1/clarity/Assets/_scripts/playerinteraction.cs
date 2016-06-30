@@ -20,6 +20,7 @@ public class playerinteraction : MonoBehaviour {
 	Vector3? point;
 
 	public GameObject raybox;
+	public GameObject collected;
 
 	void Awake()
 	{
@@ -41,13 +42,16 @@ public class playerinteraction : MonoBehaviour {
 		if(Physics.Raycast(transform.position,transform.forward,out rhit,raydistance))
 		{
 
-			if(rhit.transform.tag == "innerworld")
-			{
-				print("hitting innerworld");
+			if (rhit.transform.tag == "innerworld") {
+				//print ("hitting innerworld");
+				raybox.SetActive(true);
 				hitdistance = rhit.distance;
 				point = rhit.point;
 				raybox.transform.position = (transform.position + point.Value) / 2f;
-				raybox.transform.localScale = new Vector3(raybox.transform.localScale.x,raybox.transform.localScale.y,hitdistance);
+				raybox.transform.localScale = new Vector3 (raybox.transform.localScale.x, raybox.transform.localScale.y, hitdistance);
+			} else 
+			{
+				raybox.SetActive (false);
 			}
 
 
