@@ -4,12 +4,18 @@ using Gvr.Internal;
 
 public class playerinteraction : MonoBehaviour {
 
-	IGvrGazePointer gazepointer;
+	public	IGvrGazePointer gazer;
 
 	//start orientation
-	public Quaternion startcontrollerOR;
+	private Quaternion startcontrollerOR;
 	//player orientation
-	public Quaternion controllerOR;
+	private Quaternion controllerOR;
+	//the touchpad
+	public Vector2 touchpadxy;
+
+
+	//headmovement
+	public Transform headobj;
 
 	//mainraycast hit
 	public RaycastHit rhit;
@@ -17,15 +23,21 @@ public class playerinteraction : MonoBehaviour {
 	public float raydistance = 100f;
 	//distance from hit
 	public float hitdistance=0;
+	//hit value
 	Vector3? point;
-
+	//the pointer obj
 	public GameObject raybox;
+	//object collected
 	public GameObject collected;
 
 	void Awake()
 	{
 		startcontrollerOR = transform.rotation;
+	}
 
+	void OnEnable()
+	{
+		gazer = GazeInputModule.gazePointer;
 	}
 
 	// Use this for initialization
@@ -36,28 +48,37 @@ public class playerinteraction : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		//touchpad
+
+		touchpadxy = GvrController.TouchPos;
+
+		//movement
+	
+
 		//raycast 
 		Debug.DrawRay(transform.position,transform.forward * raydistance,Color.red,.5f);
 
-		if(Physics.Raycast(transform.position,transform.forward,out rhit,raydistance))
+		if(Physics.Raycast(transform.position,transform.forward,out rhit,Mathf.Infinity,1 << LayerMask.NameToLayer("incell")))
 		{
 
-			if (rhit.transform.tag == "innerworld") {
-				//print ("hitting innerworld");
+			Transform hit = rhit.transform;
 				raybox.SetActive(true);
 				hitdistance = rhit.distance;
 				point = rhit.point;
 				raybox.transform.position = (transform.position + point.Value) / 2f;
-				raybox.transform.localScale = new Vector3 (raybox.transform.localScale.x, raybox.transform.localScale.y, hitdistance);
-			} else 
-			{
-				raybox.SetActive (false);
-			}
-
-
+				raybox.transform.localScale = new Vector3 (raybox.transform.localScale.x, raybox.transform.localScale.y, Vector3.Distance(transform.position,point.Value));
+		
+			gazer.OnGazeStart(GetComponent<Camera>(),hit.gameObject,rhit.point,true);
 		}
+	 else 
+	{
+		raybox.SetActive (false);
+		point = null;
+	}
 
 	}
+
+
 
 	void FixedUpdate()
 	{
