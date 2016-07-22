@@ -25,6 +25,8 @@ public class playerinteraction : MonoBehaviour {
 	public Material currentrecmat;
 	//raycast rec material
 	public Material newrecmat;
+	//raycast start material
+	public Material startmat;
 
 	//headmovement
 	public Transform headobj;
@@ -43,11 +45,15 @@ public class playerinteraction : MonoBehaviour {
 	public static GameObject collected;
 	// player state system
 	public static int playerstate =0;
+	//hit transform
+	private Transform hit;
 
 	void Awake()
 	{
 		startcontrollerOR = transform.rotation;
 		currentrecmat = rec.GetComponent<MeshRenderer>().material;
+		startmat = currentrecmat;
+		startmat.color = currentrecmat.color;
 	}
 
 	void OnEnable()
@@ -55,14 +61,14 @@ public class playerinteraction : MonoBehaviour {
 		gazer = GazeInputModule.gazePointer;
 	}
 
-	// Use this for initialization
-	void Start () {
 
-	}
 	
 	// Update is called once per frame
 	void Update () {
 
+		appbuttonpress = GvrController.AppButtonDown;
+		touchingpad = GvrController.IsTouching;
+	
 		//touchpad
 		touchpadxy = GvrController.TouchPos;
 		//movement
@@ -73,7 +79,7 @@ public class playerinteraction : MonoBehaviour {
 
 		if(Physics.Raycast(transform.position,transform.forward,out rhit,Mathf.Infinity,1 << LayerMask.NameToLayer("incell")))
 		{
-			Transform hit = rhit.transform;
+				hit = rhit.transform;
 				raybox.SetActive(true);
 				hitdistance = rhit.distance;
 				point = rhit.point;
@@ -83,80 +89,130 @@ public class playerinteraction : MonoBehaviour {
 			//testing with gaze input
 			gazer.OnGazeStart(GetComponent<Camera>(),hit.gameObject,rhit.point,true);
 
-			//when seeing a element
-			if(hit.CompareTag("element"))
-			{
-				rec.GetComponent<MeshRenderer>().material.color = newrecmat.color;
 
-					switch(playerstate)
-					{
-					case 0:
-					if(appbuttonpress)
-					{
-						hit.parent = transform;
-						hit.GetComponent<Rigidbody>().isKinematic = true;
-
-						collected = hit.gameObject;
-						hit.GetComponent<elementaction>().captured = true;
-						print(playerstate);
-						playerstate =1;
-					}
-						break;
-					case 1:
-						if(appbuttonpress)
-						{
-							playerstate =2;
-						}
-						break;
-					case 2:
-						hit.parent = null;
-						hit.GetComponent<Rigidbody>().isKinematic = false;
-						hit.GetComponent<elementaction>().captured = false;
-						collected = null;
-						print(playerstate);
-						playerstate =0;
-						break;
-					}
-
-				//moving element back and forth
-				float direction = touchpadxy.y * 10;
-				float speed = 1f;
-
-				if(direction<6 && touchingpad)
-				{
-
-					float step = speed *Time.deltaTime;
-					rhit.transform.position = Vector3.MoveTowards(rhit.transform.position,transform.position,step *-1);
-				}else if(direction>6 && touchingpad)
-				{
-					float step = speed *Time.deltaTime;
-					rhit.transform.position = Vector3.MoveTowards(rhit.transform.position,transform.position,step);
-				}
-			}
-				else
-			{
-				print("change color!!!!");
-				rec.GetComponent<MeshRenderer>().material = currentrecmat;
-				if(collected!=null)
-				{
-					hit.parent = null;
-					hit.GetComponent<Rigidbody>().isKinematic = false;
-					playerstate =0;
-					hit.GetComponent<elementaction>().captured = false;
-					collected = null;
-				}
-			}
 		}
 	 else 
 		{
 			raybox.SetActive (false);
 			point = null;
 		}
-		appbuttonpress = GvrController.AppButtonDown;
-		touchingpad = GvrController.IsTouching;
+
+		//when seeing a element
+		if(hit!=null)
+		{
+
+			//if hitting central
+			if(hit.CompareTag("center"))
+			{
+				//print("hiting center");
+				switch(playerstate)
+				{
+				case 0:
+					if(appbuttonpress)
+					{
+						hit.parent = transform;
+						//hit.GetComponent<Rigidbody>().isKinematic = true;
+						hit.GetComponent<centralaction>().grabbed(transform);
+						hit.gameObject.transform.position = rhit.point;
+						collected = hit.gameObject;
+						playerstate = 1;
+						print(playerstate);
+					}
+					break;
+				case 1:
+						if(appbuttonpress)
+					{
+						playerstate =2;
+					}
+					break;
+				case 2:
+					
+						collected.transform.parent = null;
+						collected.GetComponent<Rigidbody>().isKinematic = false;
+						collected.GetComponent<centralaction>().letgo();
+						collected = null;
+						playerstate =0;
+						print(playerstate);
+					break;
+				}
+
+				//moving element back and forth
+				float direction = touchpadxy.y * 10;
+				float speed = 1f;
+ 
+
+				if(direction<6 && touchingpad)
+				{
+
+					float step = speed *Time.deltaTime;
+					rhit.transform.position = Vector3.MoveTowards(rhit.transform.position,transform.position,step *-1);
+				}else if((direction>6 && touchingpad)&& hitdistance>.5f)
+				{
+					float step = speed *Time.deltaTime;
+					rhit.transform.position = Vector3.MoveTowards(rhit.transform.position,transform.position,step);
+				}
+			}
+			else
+			if(hit.CompareTag("element"))
+			{
+				rec.GetComponent<MeshRenderer>().material.color = newrecmat.color;
+
+				switch(playerstate)
+				{
+				case 0:
+					if(appbuttonpress)
+					{
+						hit.parent = transform;
+						hit.GetComponent<Rigidbody>().isKinematic = true;
+						hit.gameObject.transform.position = rhit.point;
+						collected = hit.gameObject;
+	
+						hit.GetComponent<elementaction>().captured = true;
+
+						playerstate =1;
+					}
+					break;
+				case 1:
+					if(appbuttonpress)
+					{
+						playerstate =2;
+					}
+					break;
+				case 2:
+					collected.transform.parent = null;
+					collected.GetComponent<Rigidbody>().isKinematic = false;
+					collected.GetComponent<elementaction>().captured = false;
+					collected = null;
+					print(playerstate);
+					playerstate =0;
+					break;
+				}
+
+				//moving element back and forth
+				float direction = touchpadxy.y * 10;
+				float speed = 1f;
+
+					if(direction<6 && touchingpad)
+				{
+
+					float step = speed *Time.deltaTime;
+					rhit.transform.position = Vector3.MoveTowards(rhit.transform.position,transform.position,step *-1);
+					}else if((direction>6 && touchingpad)&& hitdistance>.5f)
+				{
+					float step = speed *Time.deltaTime;
+					rhit.transform.position = Vector3.MoveTowards(rhit.transform.position,transform.position,step);
+				}
+			}
+				else
+				{
+					playerstate =0;
+				}
+			
+
+		
 	}
 
-
+}
 
 	void FixedUpdate()
 	{

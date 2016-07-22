@@ -9,26 +9,32 @@ public class elementaction : MonoBehaviour {
 	public bool canuse = true;
 	public bool captured = false;
 
-	public float strength = 0;
+	private Collider col;
+	private Rigidbody rbody;
+
+	public float elementpower = 0;
+
 
 	void OnEnable()
 	{
+		col = GetComponent<Collider>();
+		rbody = GetComponent<Rigidbody>();
+	}
 
+	public virtual void setloc(Transform par)
+	{
+		transform.parent = par;
+		canuse = false;
+		captured = true;
+		col.enabled = false;
+		rbody.isKinematic = true;
 
 	}
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-		
-
+ 
 	// Update is called once per frame
 	void Update () {
-		if(!canuse)
-		{
-			GetComponent<Collider>().enabled = false;
-		}
+
 	
 	}
 }
