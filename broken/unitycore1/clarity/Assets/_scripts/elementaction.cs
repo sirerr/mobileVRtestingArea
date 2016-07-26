@@ -23,6 +23,7 @@ public class elementaction : MonoBehaviour {
 
 	public virtual void setloc(Transform par)
 	{
+		playerinteraction.playerstate = 0;
 		transform.parent = par;
 		canuse = false;
 		captured = true;

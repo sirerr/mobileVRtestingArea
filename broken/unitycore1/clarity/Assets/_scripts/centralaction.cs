@@ -74,6 +74,7 @@ public class centralaction : MonoBehaviour {
 
 	public virtual void setinspot(Transform par)
 	{
+		playerinteraction.playerstate =0;
 		transform.parent = par;
 		col.enabled = false;
 	//	rbody.isKinematic = true;
