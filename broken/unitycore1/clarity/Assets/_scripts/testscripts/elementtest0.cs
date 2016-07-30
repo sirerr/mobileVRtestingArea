@@ -8,4 +8,9 @@ public class elementtest0 : elementaction {
 		base.setloc (par);
 	}
 
+	public override void Update ()
+	{
+		base.Update ();
+	}
+
 }

@@ -3,6 +3,9 @@ using System.Collections;
 
 public class playerstats : MonoBehaviour {
 
+
+
+
 	// Use this for initialization
 	void Start () {
 	
@@ -11,5 +14,12 @@ public class playerstats : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
+	}
+
+
+	void Enable()
+	{
+
+
 	}
 }

@@ -14,6 +14,7 @@ public class elementaction : MonoBehaviour {
 
 	public float elementpower = 0;
 
+	public bool acklook = false;
 
 	void OnEnable()
 	{
@@ -34,8 +35,19 @@ public class elementaction : MonoBehaviour {
 
  
 	// Update is called once per frame
-	void Update () {
+	public virtual	void Update () {
 
+		if(playerinteraction.lookedatobj == transform.gameObject)
+		{
+			acklook = true;
+		}
+		else
+		{
+			acklook = false;
+		}
 	
 	}
+
+
+
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Gvr.Internal;
+using System.Collections.Generic;
 
 public class playerinteraction : MonoBehaviour {
 
@@ -42,13 +43,16 @@ public class playerinteraction : MonoBehaviour {
 	//the pointer obj
 	public GameObject raybox;
 	//object collected
-	public static GameObject collected;
+	public static GameObject lookedatobj;
 	// player state system
 	public static int playerstate =0;
 	//hit transform
 	private Transform hit;
-	//grabbed onto something
-	private bool inhand = false;
+	//list of gameobjects collected
+	public static List<GameObject> elementcolection = new List<GameObject>();
+	//game objects collected count
+	public int elementint = 0;
+
 
 	//movement variables
 	private	float direction =0;
@@ -72,6 +76,10 @@ public class playerinteraction : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		controllerOR = GvrController.Orientation;
+		transform.rotation = controllerOR;
+
+
 		appbuttonpress = GvrController.AppButtonDown;
 		touchingpad = GvrController.IsTouching;
 
@@ -90,6 +98,7 @@ public class playerinteraction : MonoBehaviour {
 				hit = rhit.transform;
 				raybox.SetActive(true);
 				hitdistance = rhit.distance;
+				lookedatobj = hit.gameObject;
 				point = rhit.point;
 				raybox.transform.position = (transform.position + point.Value) / 2f;
 				raybox.transform.localScale = new Vector3 (raybox.transform.localScale.x, raybox.transform.localScale.y, Vector3.Distance(transform.position,point.Value));
@@ -106,75 +115,25 @@ public class playerinteraction : MonoBehaviour {
 		}
 		//raycast
 
- 
- 
- 
-			switch (playerstate)
-			{
-			case 0:
-			if(appbuttonpress)
-			{
-				grabbedobject(hit);
-			}
-				break;
-			case 1:
-						if(direction<6 &&touchingpad)
-						{
-							float step = speed *Time.deltaTime;
-							collected.transform.position = Vector3.MoveTowards(collected.transform.position,transform.position,step *-1);
-						}else if ((direction<6 &&touchingpad) && hitdistance>.5f)
-						{
-							float step = speed *Time.deltaTime;
-							collected.transform.position = Vector3.MoveTowards(collected.transform.position,transform.position,step);
-						}
-			if(appbuttonpress)
-			{
-				playerstate =2;
-			}
-				break;
-			case 2:
-				letgoobject(hit);
-				break;
-
-			}
- 
-	}
-
-	void FixedUpdate()
-	{
-		controllerOR = GvrController.Orientation;
-		transform.rotation = controllerOR;
-		
-	}
-
-
-	public void grabbedobject(Transform obj)
-	{
-		switch(hit.tag)
+		if(appbuttonpress)
 		{
-		case "element":
-			collected = hit.gameObject;
-			print("hitting element");
-			break;
-		case "center":
-			collected = hit.gameObject;
-			print("hitting center");
-			break;
+			switch (hit.tag)
+			{
+			case "element":
 
-		}
-		if(collected!=null)
-		{
-			collected.transform.parent = transform.parent;
-			inhand=true;
-			collected.transform.position = rhit.point;
-			playerstate =1;
+				break;
+			}
 		}
 
+
 	}
 
-	public void letgoobject(Transform obj0)
+
+
+	public void elementcollector(Transform obj)
 	{
-		collected =null;
-		playerstate =0;
+
+
 	}
+
 }
