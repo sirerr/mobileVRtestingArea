@@ -12,23 +12,5 @@ public class centralhitboxaction : MonoBehaviour {
 
 	}
 
-	void OnTriggerEnter(Collider col)
-	{
-		print("element entered the trigger");
 
-		if(col.CompareTag("element") && !occupied)
-		{
-			if(col.GetComponent<elementaction>().captured)
-			{
-				occupied = true;
-				col.transform.position = transform.position;
-			//	col.transform.rotation = transform.rotation;
-				col.transform.parent =null;
-				col.GetComponent<elementaction>().setloc(transform.parent);
-				par.GetComponent<centralaction>().elementaddedcounter++;
-				par.GetComponent<centralaction>().collectedpower += col.GetComponent<elementaction>().elementpower;
-			}
-		}
-
-	}
 }

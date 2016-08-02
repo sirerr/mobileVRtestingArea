@@ -13,4 +13,11 @@ public class elementtest0 : elementaction {
 		base.Update ();
 	}
 
+	public override void collected (Transform point)
+	{
+		base.collected (point);
+	}
+
+
+
 }

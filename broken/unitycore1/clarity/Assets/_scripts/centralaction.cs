@@ -3,90 +3,58 @@ using System.Collections;
 
 public class centralaction : MonoBehaviour {
 
-	//for element parts
-	public int attachpointsactive =0;
-	public int activecounter=0;
+	//elements added to the central object
+	public int elementadded;
+	// power needed to be complete
+	public float neededpower=0;
+	//power collected by the center object
 	public float collectedpower = 0;
 
-	public GameObject[] attachpointobjs;
-	private int childrencount;
-
 	//for central mode
-
-	public bool isgrabbed = false;
-	public bool setinplace = false;
-
 	public bool fullpower = false;
 
-	public int elementaddedcounter = 0;
 
 	public Rigidbody rbody;
 	public Collider col;
 
+	public int centralstate =0;
+	public float forceamount =5f;
+
+
 	void Awake()
 	{
-		createelementhitlocs();
+	//	createelementhitlocs();
 	
 		rbody = GetComponent<Rigidbody>();
 		col = GetComponent<Collider>();
 	
+
 	}
 
-
-	public void createelementhitlocs()
+	public virtual void centralstateaction()
 	{
-		attachpointsactive = Random.Range(2,6);
-		childrencount = transform.childCount;
-
-		// creates element hit locations
-		for(int i=0;i<childrencount;i++)
+		if(centralstate == 0)
 		{
-
-			int a = Random.Range(0,2);
-			if(a ==1 && (activecounter<attachpointsactive))
-			{
-				attachpointobjs[i] = transform.GetChild(i).gameObject;
-				activecounter++;
-			}
-			else
-			{
-				attachpointobjs[i] = transform.GetChild(i).gameObject;
-				attachpointobjs[i].SetActive(false);
-			}
+			becomeactive();
 		}
 
-		for(int i=0;i<childrencount;i++)
+		if(centralstate ==1)
 		{
-			if((activecounter!=attachpointsactive) && (!attachpointobjs[i].activeSelf))
-			{
-				attachpointobjs[i].SetActive(true);
-				activecounter++;
-			}
-
+			
 		}
 	}
 
-	public virtual void grabbed(Transform looker)
-	{
-		isgrabbed = true;
-		transform.LookAt(looker);
-	}
 
-	public virtual void setinspot(Transform par)
-	{
-		playerinteraction.playerstate =0;
-		transform.parent = par;
-		col.enabled = false;
-	//	rbody.isKinematic = true;
-		rbody.constraints = RigidbodyConstraints.FreezeRotation;
-	}
 
-	public virtual void letgo()
-	{
-		isgrabbed = false;
-		transform.parent = null;
 		
+	public virtual void becomeactive()
+	{
+		centralstate =1;
+		rbody.velocity = Vector3.zero;
+		print("working");
+		//also expand the circle around it and make it look good
 	}
+		
 
 	public virtual void poweredup()
 	{
@@ -96,7 +64,7 @@ public class centralaction : MonoBehaviour {
 	public virtual void Update()
 	{
 
-		if(elementaddedcounter == childrencount && !fullpower)
+		if(collectedpower == neededpower)
 		{
 			fullpower = true;
 			poweredup();

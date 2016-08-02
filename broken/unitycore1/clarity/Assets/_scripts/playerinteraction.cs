@@ -18,7 +18,7 @@ public class playerinteraction : MonoBehaviour {
 	//app button pressed
 	public bool appbuttonpress = false;
 	// touchpad touch
-	public bool touchingpad = false;
+	public bool touchpaddown = false;
 
 	//recticle
 	public Transform rec;
@@ -49,9 +49,11 @@ public class playerinteraction : MonoBehaviour {
 	//hit transform
 	private Transform hit;
 	//list of gameobjects collected
-	public static List<GameObject> elementcolection = new List<GameObject>();
+	public List<GameObject> elementcolection = new List<GameObject>();
 	//game objects collected count
-	public int elementint = 0;
+	public int elementintcount = 0;
+	//collect point
+	public Transform collectpoint;
 
 
 	//movement variables
@@ -81,7 +83,7 @@ public class playerinteraction : MonoBehaviour {
 
 
 		appbuttonpress = GvrController.AppButtonDown;
-		touchingpad = GvrController.IsTouching;
+		touchpaddown = GvrController.TouchDown;
 
 		direction = touchpadxy.y * 10;
 	
@@ -120,20 +122,58 @@ public class playerinteraction : MonoBehaviour {
 			switch (hit.tag)
 			{
 			case "element":
+				elementcollector(hit);
+				break;
+			
+			case "corecenter":
+				elementcenter(hit);
+				break;
+			
+			
+			}
+		}
 
+		if(touchpaddown)
+		{
+
+			switch(hit.tag)
+			{
+			case "element":
+				break;
+			case "corecenter":
+				touchpadactioncenterobj();
 				break;
 			}
+
 		}
 
 
 	}
 
+	public void touchpadactioncenterobj()
+	{
+		hit.GetComponent<centralaction>().centralstateaction();
+	}
 
 
 	public void elementcollector(Transform obj)
 	{
-
-
+	//	print("collected");
+		elementcolection.Add(obj.gameObject);
+	//	print(obj.GetComponent<elementaction>().acklook);
+		obj.GetComponent<elementaction>().collected(collectpoint);
+		elementintcount++;
 	}
+		
 
+	public void elementcenter(Transform hit)
+	{
+		if(elementintcount>0)
+		{
+			elementcolection[elementintcount-1].GetComponent<elementaction>().letloose(hit,rhit.point);
+			elementcolection.Remove(elementcolection[elementintcount-1]);
+			elementintcount--;
+
+		}
+	}
 }
