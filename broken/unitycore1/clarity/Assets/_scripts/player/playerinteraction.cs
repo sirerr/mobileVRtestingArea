@@ -48,12 +48,17 @@ public class playerinteraction : MonoBehaviour {
 	public static int playerstate =0;
 	//hit transform
 	private Transform hit;
-	//list of gameobjects collected
+	//list of elements collected
 	public List<GameObject> elementcolection = new List<GameObject>();
 	//game objects collected count
 	public int elementintcount = 0;
 	//collect point
 	public Transform collectpoint;
+	//central collect point
+	public Transform centercollectpoint;
+
+	//the center object collected by the player
+	private GameObject centercollected;
 
 
 	//movement variables
@@ -128,8 +133,12 @@ public class playerinteraction : MonoBehaviour {
 			case "corecenter":
 				elementcenter(hit);
 				break;
-			
-			
+			case "cellholeloc":
+				cellholecenterlocaction(hit);
+				break;
+			case "bulb":
+				bulblookat(hit);
+				break;
 			}
 		}
 
@@ -150,6 +159,20 @@ public class playerinteraction : MonoBehaviour {
 
 	}
 
+	public void bulblookat(Transform obj)
+	{
+
+		obj.GetComponent<bulbaction>().absorbed();
+	}
+
+	public void cellholecenterlocaction(Transform obj)
+	{
+		if(centercollected!=null)
+		{
+			centercollected.GetComponent<centralaction>().tohole(obj);
+		}
+	}
+
 	public void touchpadactioncenterobj()
 	{
 		hit.GetComponent<centralaction>().centralstateaction();
@@ -168,12 +191,23 @@ public class playerinteraction : MonoBehaviour {
 
 	public void elementcenter(Transform hit)
 	{
-		if(elementintcount>0)
+		if(hit.GetComponent<centralaction>().centralstate ==2)
 		{
-			elementcolection[elementintcount-1].GetComponent<elementaction>().letloose(hit,rhit.point);
-			elementcolection.Remove(elementcolection[elementintcount-1]);
-			elementintcount--;
+			centercollected = hit.gameObject;
+			hit.GetComponent<centralaction>().grabbed(centercollectpoint);
+			playerstate =1;
+		}else {
 
+			if(elementintcount>0)
+			{
+				elementcolection[elementintcount-1].GetComponent<elementaction>().letloose(rhit.point);
+				elementcolection.Remove(elementcolection[elementintcount-1]);
+				elementintcount--;
+
+			}
 		}
+
+
+
 	}
 }

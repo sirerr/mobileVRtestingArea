@@ -3,11 +3,6 @@ using System.Collections;
 
 public class elementtest0 : elementaction {
 
-	public override void setloc (Transform par)
-	{
-		base.setloc (par);
-	}
-
 	public override void Update ()
 	{
 		base.Update ();
@@ -18,6 +13,9 @@ public class elementtest0 : elementaction {
 		base.collected (point);
 	}
 
-
+	public override void letloose (Vector3 par)
+	{
+		base.letloose (par);
+	}
 
 }
