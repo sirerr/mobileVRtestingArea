@@ -60,6 +60,10 @@ public class playerinteraction : MonoBehaviour {
 	//the center object collected by the player
 	private GameObject centercollected;
 
+	//the positive energy blast object
+	public GameObject posblastobj;
+	// player attack speed
+	public float attackspeed = 0; 
 
 	//movement variables
 	private	float direction =0;
@@ -139,6 +143,11 @@ public class playerinteraction : MonoBehaviour {
 			case "bulb":
 				bulblookat(hit);
 				break;
+			
+				default:
+				positiveshot (hit);
+				break;
+			
 			}
 		}
 
@@ -157,6 +166,16 @@ public class playerinteraction : MonoBehaviour {
 		}
 
 
+	}
+
+	public void positiveshot(Transform currentpoint)
+	{
+		if(playerstats.playerposenergy >0)
+		{
+			GameObject posobj = Instantiate(posblastobj,transform.position,transform.rotation) as GameObject;
+			posobj.GetComponent<Rigidbody>().velocity = transform.forward * attackspeed;
+			playerstats.playerposenergy--;
+		}
 	}
 
 	public void bulblookat(Transform obj)
