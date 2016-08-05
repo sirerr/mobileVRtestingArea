@@ -5,7 +5,7 @@ public class playerstats : MonoBehaviour {
 
 	public playerinteraction playerintref;
 
-	public static int playerposenergy = 0;
+	public static int playerposenergy = 15;
 	public static int playerhealth =10;
 	void Awake()
 	{

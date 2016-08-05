@@ -8,7 +8,7 @@ public class centralaction : MonoBehaviour {
 	// power needed to be complete
 	public float neededpower=0;
 	//power collected by the center object
-	public float collectedpower = 0;
+	public int collectedpower = 0;
 
 	//for central mode
 	public bool fullpower = false;
@@ -20,20 +20,39 @@ public class centralaction : MonoBehaviour {
 	public int centralstate =0;
 	//is it being raycasted to
 	public bool acklook = false;
+	//speed to hole
+	public float vel = 8f;
+	// is it set in a hole
+	private bool setinhole = false;
+	//the first child object the outer area
+	private GameObject outerarea;
 
-	public float vel = 5f;
-	void Awake()
+	public virtual void Awake()
 	{	
 		rbody = GetComponent<Rigidbody>();
 		col = GetComponent<Collider>();
+
+		rbody.constraints = RigidbodyConstraints.None;
+		float ranx = Random.Range(-5,5);
+		float rany = Random.Range(-5,5);
+		float ranz = Random.Range(-5,5);
+		rbody.AddForce(ranx,rany,ranz);
+		outerarea = transform.GetChild(0).gameObject;
+		outerarea.SetActive(false);
 	}
 
 	public virtual void tohole(Transform holepoint)
 	{
 		rbody.constraints = RigidbodyConstraints.None;
+		setinhole = true;
 		Vector3 dir = (holepoint.position - transform.position) *vel;
 		rbody.velocity = dir;
 		rbody.isKinematic = false;
+		int childs = transform.childCount;
+		for(int i=0;i<childs;i++)
+		{
+			transform.GetChild(i).gameObject.SetActive(true);
+		}
 
 	}
 
@@ -46,10 +65,15 @@ public class centralaction : MonoBehaviour {
 		}else if(centralstate ==1 && !fullpower)
 		{
 				rbody.constraints = RigidbodyConstraints.None;
-			float ranx = Random.Range(0,5);
-			float rany = Random.Range(0,5);
-			float ranz = Random.Range(0,5);
+			float ranx = Random.Range(-5,5);
+			float rany = Random.Range(-5,5);
+			float ranz = Random.Range(-5,5);
 			rbody.AddForce(ranx,rany,ranz);
+			int childs = transform.childCount;
+			for(int i=0;i<childs;i++)
+			{
+				transform.GetChild(i).gameObject.SetActive(false);
+			}
 			centralstate =0;
 		}else if (centralstate==1 &&fullpower)
 		{
@@ -60,23 +84,26 @@ public class centralaction : MonoBehaviour {
 	IEnumerator centralstatewait()
 	{
 
-		yield return new WaitForSeconds(3f);
+		yield return new WaitForSeconds(.5f);
 		rbody.constraints = RigidbodyConstraints.FreezeRotation;
 		centralstate =2;
 	}
 
 	public virtual void grabbed(Transform centercollect)
 	{
-		rbody.constraints = RigidbodyConstraints.FreezeAll;
-		rbody.isKinematic = true;
-		transform.position = centercollect.position;
-		int childs = transform.childCount;
-		for(int i=0;i<childs;i++)
-		{
-			transform.GetChild(i).gameObject.SetActive(false);
-		}
 
-	
+		if(!setinhole && fullpower)
+		{
+			rbody.constraints = RigidbodyConstraints.FreezeAll;
+			rbody.isKinematic = true;
+			transform.position = centercollect.position;
+			int childs = transform.childCount;
+			for(int i=0;i<childs;i++)
+			{
+				transform.GetChild(i).gameObject.SetActive(false);
+			}
+
+		}
 
 	}
 
@@ -86,7 +113,11 @@ public class centralaction : MonoBehaviour {
 		centralstate =1;
 		rbody.velocity = Vector3.zero;
 		rbody.constraints = RigidbodyConstraints.FreezePosition;
-
+		int childs = transform.childCount;
+		for(int i=0;i<childs;i++)
+		{
+			transform.GetChild(i).gameObject.SetActive(true);
+		}
 		//also expand the circle around it and make it look good
 	}
 		

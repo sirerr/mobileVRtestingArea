@@ -23,9 +23,9 @@ public class bulbaction : MonoBehaviour {
 		rbody =GetComponent<Rigidbody>();
 		col = GetComponent<Collider>();
 
-		ranx = Random.Range(0,5);
-		rany = Random.Range(0,5);
-		ranz = Random.Range(0,5);
+		ranx = Random.Range(-5,5);
+		rany = Random.Range(-5,5);
+		ranz = Random.Range(-5,5);
 
 		rbody.AddForce(ranx,rany,ranz);
 

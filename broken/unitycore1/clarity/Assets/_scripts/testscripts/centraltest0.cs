@@ -4,15 +4,15 @@ using System.Collections;
 public class centraltest0 : centralaction{
 
 
-	void Awake()
+	public override void Awake ()
 	{
-		
+
 		rbody = GetComponent<Rigidbody>();
 		col = GetComponent<Collider>();
 
+		base.Awake ();
 	}
 		
-
 	public override void Update ()
 	{
 		base.Update ();

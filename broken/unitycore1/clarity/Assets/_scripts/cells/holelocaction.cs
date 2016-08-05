@@ -3,10 +3,12 @@ using System.Collections;
 
 public class holelocaction : MonoBehaviour {
 
+	//if it's occuppied
 	public bool occupied = false;
-
+	//being looked at
 	public bool acklook = false;
-
+	//
+	public int power =0;
 
 	public virtual void OnCollisionEnter(Collision col)
 	{
@@ -15,7 +17,8 @@ public class holelocaction : MonoBehaviour {
 			col.rigidbody.isKinematic = true;
 			col.transform.position = transform.position;
 			occupied = true;
-			print(col.transform.name);
+			power+= col.transform.GetComponent<centralaction>().collectedpower;
+			transform.parent.GetComponent<cellaction>().addedpower+=power;
 		}
 	
 	}

@@ -12,11 +12,14 @@ public class elementaction : MonoBehaviour {
 	// positive or negative energy
 	public bool purestate = true;
 
+	public Material puremat;
+	public Material badmat;
+
 	private Collider col;
 	private Rigidbody rbody;
 	private MeshRenderer meshren;
 
-	public float elementpower = 0;
+	public int elementpower = 0;
 
 	public bool acklook = false;
 	public float vel = 5f;
@@ -26,6 +29,15 @@ public class elementaction : MonoBehaviour {
 		col = GetComponent<Collider>();
 		rbody = GetComponent<Rigidbody>();
 		meshren = GetComponent<MeshRenderer>();
+
+		if(!purestate)
+		{
+			meshren.material = badmat;
+		}
+		else
+		{
+			meshren.material = puremat;
+		}
 	}
 
  
@@ -56,6 +68,15 @@ public class elementaction : MonoBehaviour {
 			captured =true;
 		}
 
+	}
+
+	public virtual void cleanelement()
+	{
+		if(!purestate)
+		{
+			purestate = true;
+			meshren.material = puremat;
+		}
 	}
 		
 	public virtual void letloose(Vector3 par)

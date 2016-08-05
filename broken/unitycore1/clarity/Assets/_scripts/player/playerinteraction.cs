@@ -56,14 +56,14 @@ public class playerinteraction : MonoBehaviour {
 	public Transform collectpoint;
 	//central collect point
 	public Transform centercollectpoint;
+	//front of diamond
+	public Transform diamondfrontpoint;
 
 	//the center object collected by the player
 	private GameObject centercollected;
 
 	//the positive energy blast object
 	public GameObject posblastobj;
-	// player attack speed
-	public float attackspeed = 0; 
 
 	//movement variables
 	private	float direction =0;
@@ -104,15 +104,15 @@ public class playerinteraction : MonoBehaviour {
 		//raycast 
 		Debug.DrawRay(transform.position,transform.forward * raydistance,Color.red,.5f);
 
-		if(Physics.Raycast(transform.position,transform.forward,out rhit,Mathf.Infinity,1 << LayerMask.NameToLayer("incell")))
+		if(Physics.Raycast(diamondfrontpoint.position,transform.forward,out rhit,Mathf.Infinity,1 << LayerMask.NameToLayer("incell")))
 		{
 				hit = rhit.transform;
 				raybox.SetActive(true);
 				hitdistance = rhit.distance;
 				lookedatobj = hit.gameObject;
 				point = rhit.point;
-				raybox.transform.position = (transform.position + point.Value) / 2f;
-				raybox.transform.localScale = new Vector3 (raybox.transform.localScale.x, raybox.transform.localScale.y, Vector3.Distance(transform.position,point.Value));
+			raybox.transform.position = (diamondfrontpoint.position + point.Value) / 2f;
+			raybox.transform.localScale = new Vector3 (raybox.transform.localScale.x, raybox.transform.localScale.y, Vector3.Distance(diamondfrontpoint.position,point.Value));
 
 			//testing with gaze input
 			gazer.OnGazeStart(GetComponent<Camera>(),hit.gameObject,rhit.point,true);
@@ -157,13 +157,36 @@ public class playerinteraction : MonoBehaviour {
 			switch(hit.tag)
 			{
 			case "element":
+				elementcleansing(hit);
 				break;
 			case "corecenter":
 				touchpadactioncenterobj();
 				break;
+			case "bulb":
+				//cleansingbulb(hit);
+				break;
 			}
 
 		}
+
+
+	}
+
+	public void elementcleansing(Transform elementobj)
+	{
+
+		if(playerstats.playerposenergy>0)
+		{
+			hit.GetComponent<elementaction>().cleanelement();
+			playerstats.playerposenergy--;
+		}
+
+	
+
+	}
+
+	public void cleansingbulb(Transform bulbobj)
+	{
 
 
 	}
@@ -173,10 +196,11 @@ public class playerinteraction : MonoBehaviour {
 		if(playerstats.playerposenergy >0)
 		{
 			GameObject posobj = Instantiate(posblastobj,transform.position,transform.rotation) as GameObject;
-			posobj.GetComponent<Rigidbody>().velocity = transform.forward * attackspeed;
 			playerstats.playerposenergy--;
 		}
 	}
+
+
 
 	public void bulblookat(Transform obj)
 	{
@@ -189,6 +213,7 @@ public class playerinteraction : MonoBehaviour {
 		if(centercollected!=null)
 		{
 			centercollected.GetComponent<centralaction>().tohole(obj);
+			centercollected = null;
 		}
 	}
 
@@ -210,12 +235,14 @@ public class playerinteraction : MonoBehaviour {
 
 	public void elementcenter(Transform hit)
 	{
-		if(hit.GetComponent<centralaction>().centralstate ==2)
+		centralaction centeractref = hit.GetComponent<centralaction>();
+
+		if(centeractref.centralstate ==2)
 		{
 			centercollected = hit.gameObject;
 			hit.GetComponent<centralaction>().grabbed(centercollectpoint);
 			playerstate =1;
-		}else {
+		}else if(centeractref.centralstate ==1 && !centeractref.fullpower) {
 
 			if(elementintcount>0)
 			{
