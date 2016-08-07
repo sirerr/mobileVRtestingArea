@@ -143,7 +143,9 @@ public class playerinteraction : MonoBehaviour {
 			case "bulb":
 				bulblookat(hit);
 				break;
-			
+			case "movers":
+				moveraction(hit);
+				break;
 				default:
 				positiveshot (hit);
 				break;
@@ -172,6 +174,12 @@ public class playerinteraction : MonoBehaviour {
 
 	}
 
+	public void moveraction(Transform lookobj)
+	{
+		lookobj.transform.parent.GetComponent<cellaction>().rotatecell();
+
+	}
+
 	public void elementcleansing(Transform elementobj)
 	{
 
@@ -180,9 +188,6 @@ public class playerinteraction : MonoBehaviour {
 			hit.GetComponent<elementaction>().cleanelement();
 			playerstats.playerposenergy--;
 		}
-
-	
-
 	}
 
 	public void cleansingbulb(Transform bulbobj)
