@@ -14,25 +14,24 @@ public class cellaction : MonoBehaviour {
 	//the power added by the cells
 	public int addedpower =0;
 	//list of turners
-	public List<GameObject> turners = new List<GameObject>();
+
 	//spawn location
 	public Transform spawnloc;
-	//
-	private GameObject currentmover;
-	public GameObject centerobj;
 
+	//rotation vars
+	//default rotation
+	private Vector3 defaultrotation;
+	private Vector3 currentrotation;
+	private Vector3 lastdirection;
 
-	void Awake()
+	public bool dorotate = false;
+	public bool gotvalues = false;
+
+	public Vector3 raypoint;
+
+	public virtual	void Awake()
 	{
-		int counter = 0;
-		for(int i =0; i<transform.childCount;i++)
-		{
-			if(transform.GetChild(i).CompareTag("movers"))
-			{
-				turners.Add( transform.GetChild(i).gameObject);
-				counter++;
-			}
-		}
+		defaultrotation = transform.rotation.eulerAngles;
 			
 	}
 
@@ -50,17 +49,44 @@ public class cellaction : MonoBehaviour {
 		else
 		{
 			acklook = false;
+
 		}
 
 		if(addedpower == requiredpower && !celldone)
 		{
 			celldone = true;
 			finishedcell();
+		}
 
+		if(dorotate)
+		{
+			rotatecell();
+		}
+			
+	}
+
+	public virtual void getrotateready(Vector3 lookpoint)
+	{
+		if(!gotvalues)
+		{		
+			currentrotation = transform.rotation.eulerAngles;
+			lastdirection = lookpoint - transform.position;
+			gotvalues = true;
 		}
 	}
 
 	public virtual void rotatecell()
+	{
+		Vector3 targetdir = raypoint - transform.position;
+
+		Quaternion newdir = Quaternion.FromToRotation(lastdirection,targetdir);
+
+		transform.rotation = newdir * transform.rotation;
+		lastdirection = targetdir;
+
+	}
+
+	public virtual void leavecell()
 	{
 
 

@@ -19,6 +19,10 @@ public class playerinteraction : MonoBehaviour {
 	public bool appbuttonpress = false;
 	// touchpad touch
 	public bool touchpaddown = false;
+	//click button
+	public bool clickpress = false;
+	//click button up
+	public bool clickpressup = false;
 
 	//recticle
 	public Transform rec;
@@ -65,6 +69,8 @@ public class playerinteraction : MonoBehaviour {
 	//the positive energy blast object
 	public GameObject posblastobj;
 
+	private int pmask = (1<< 8)| (1<<11);
+
 	//movement variables
 	private	float direction =0;
 	private float speed = 1f;
@@ -93,6 +99,8 @@ public class playerinteraction : MonoBehaviour {
 
 		appbuttonpress = GvrController.AppButtonDown;
 		touchpaddown = GvrController.TouchDown;
+		clickpress = GvrController.ClickButton;
+		clickpressup = GvrController.ClickButtonUp;
 
 		direction = touchpadxy.y * 10;
 	
@@ -104,7 +112,7 @@ public class playerinteraction : MonoBehaviour {
 		//raycast 
 		Debug.DrawRay(transform.position,transform.forward * raydistance,Color.red,.5f);
 
-		if(Physics.Raycast(diamondfrontpoint.position,transform.forward,out rhit,Mathf.Infinity,1 << LayerMask.NameToLayer("incell")))
+		if(Physics.Raycast(diamondfrontpoint.position,transform.forward,out rhit,Mathf.Infinity,pmask))
 		{
 				hit = rhit.transform;
 				raybox.SetActive(true);
@@ -143,13 +151,33 @@ public class playerinteraction : MonoBehaviour {
 			case "bulb":
 				bulblookat(hit);
 				break;
-			case "movers":
-				moveraction(hit);
-				break;
+
 				default:
 				positiveshot (hit);
 				break;
 			
+			}
+		}
+
+		if(clickpress)
+		{
+			switch(hit.tag)
+			{
+				case "cell":
+				print("click happening");
+			//	print(rhit.point);
+				cellrotation(rhit.point,hit);
+				break;
+			}
+		}
+
+		if (clickpressup)
+		{
+			switch(hit.tag)
+			{
+				case "cell":
+				resetcellrotation(hit);
+				break;
 			}
 		}
 
@@ -174,10 +202,17 @@ public class playerinteraction : MonoBehaviour {
 
 	}
 
-	public void moveraction(Transform lookobj)
+	public void resetcellrotation(Transform hitobj)
 	{
-		lookobj.transform.parent.GetComponent<cellaction>().rotatecell();
+		hitobj.GetComponent<cellaction>().dorotate = false;
+		hitobj.GetComponent<cellaction>().gotvalues = false;		
+	}
 
+	public void cellrotation(Vector3 hitpoint,Transform celltrans)
+	{
+		celltrans.GetComponent<cellaction>().getrotateready(hitpoint);
+		celltrans.GetComponent<cellaction>().raypoint = hitpoint;
+		celltrans.GetComponent<cellaction>().dorotate = true;
 	}
 
 	public void elementcleansing(Transform elementobj)
