@@ -10,7 +10,7 @@ public class playerinteraction : MonoBehaviour {
 	//start orientation
 	private Quaternion startcontrollerOR;
 	//player orientation
-	private Quaternion controllerOR;
+	public Quaternion controllerOR;
 	//the touchpad
 	private Vector2 touchpadxy;
 	//acellerometer
@@ -35,6 +35,8 @@ public class playerinteraction : MonoBehaviour {
 
 	//headmovement
 	public Transform headobj;
+	//crystal object
+	public Transform maincontrol;
 
 	//mainraycast hit
 	public RaycastHit rhit;
@@ -93,35 +95,37 @@ public class playerinteraction : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		//all controller input
 		controllerOR = GvrController.Orientation;
-		transform.rotation = controllerOR;
-
-
 		appbuttonpress = GvrController.AppButtonDown;
 		touchpaddown = GvrController.TouchDown;
 		clickpress = GvrController.ClickButton;
 		clickpressup = GvrController.ClickButtonUp;
 
+		//old code isn't used
 		direction = touchpadxy.y * 10;
 	
 		//touchpad
 		touchpadxy = GvrController.TouchPos;
 		//movement
 		controlleraccel = GvrController.Accel;
+		//controller orientation
+		maincontrol.rotation = controllerOR;
+
 
 		//raycast 
-		Debug.DrawRay(transform.position,transform.forward * raydistance,Color.red,.5f);
+		Debug.DrawRay(diamondfrontpoint.position,diamondfrontpoint.forward * raydistance,Color.red,.5f);
 
-		if(Physics.Raycast(diamondfrontpoint.position,transform.forward,out rhit,Mathf.Infinity,pmask))
+		if(Physics.Raycast(diamondfrontpoint.position,diamondfrontpoint.forward,out rhit,Mathf.Infinity,pmask))
 		{
 				hit = rhit.transform;
 				raybox.SetActive(true);
 				hitdistance = rhit.distance;
 				lookedatobj = hit.gameObject;
 				point = rhit.point;
-			raybox.transform.position = (diamondfrontpoint.position + point.Value) / 2f;
+			raybox.transform.position = (raybox.transform.parent.transform.position + point.Value) / 2f;
 			raybox.transform.localScale = new Vector3 (raybox.transform.localScale.x, raybox.transform.localScale.y, Vector3.Distance(diamondfrontpoint.position,point.Value));
-
+	
 			//testing with gaze input
 			gazer.OnGazeStart(GetComponent<Camera>(),hit.gameObject,rhit.point,true);
 
@@ -164,7 +168,7 @@ public class playerinteraction : MonoBehaviour {
 			switch(hit.tag)
 			{
 				case "cell":
-				print("click happening");
+			//	print("click happening");
 			//	print(rhit.point);
 				cellrotation(rhit.point,hit);
 				break;
@@ -235,7 +239,7 @@ public class playerinteraction : MonoBehaviour {
 	{
 		if(playerstats.playerposenergy >0)
 		{
-			GameObject posobj = Instantiate(posblastobj,transform.position,transform.rotation) as GameObject;
+			GameObject posobj = Instantiate(posblastobj,diamondfrontpoint.position,diamondfrontpoint.rotation) as GameObject;
 			playerstats.playerposenergy--;
 		}
 	}
@@ -265,11 +269,14 @@ public class playerinteraction : MonoBehaviour {
 
 	public void elementcollector(Transform obj)
 	{
-	//	print("collected");
-		elementcolection.Add(obj.gameObject);
-	//	print(obj.GetComponent<elementaction>().acklook);
-		obj.GetComponent<elementaction>().collected(collectpoint);
-		elementintcount++;
+		if(playerstats.playerposenergy>playerstats.playerposenergylimit)
+		{
+			elementcolection.Add(obj.gameObject);
+
+			obj.GetComponent<elementaction>().collected(collectpoint);
+			elementintcount++;
+		}
+
 	}
 		
 
