@@ -3,7 +3,8 @@ using System.Collections;
 
 public class feeleraction : MonoBehaviour {
 
-	public float playerspeed = 0;
+	private float feelerspeed = 0;
+	public float speedadder = 0;
 
 	void Awake()
 	{
@@ -12,11 +13,11 @@ public class feeleraction : MonoBehaviour {
 
 	void Update()
 	{
-		playerspeed = playerstats.playerposenergylimit *4;
+		feelerspeed = playerstats.playerposenergylimit * Time.deltaTime;
 
-		if(playerspeed>0)
+		if(feelerspeed>0)
 		{
-			transform.Rotate(Vector3.up * playerspeed * Time.deltaTime);
+			transform.Rotate(Vector3.up * feelerspeed * speedadder);
 
 		}
 	}

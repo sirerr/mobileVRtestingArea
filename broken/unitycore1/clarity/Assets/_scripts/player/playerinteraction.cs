@@ -10,7 +10,7 @@ public class playerinteraction : MonoBehaviour {
 	//start orientation
 	private Quaternion startcontrollerOR;
 	//player orientation
-	public Quaternion controllerOR;
+	private Quaternion controllerOR;
 	//the touchpad
 	private Vector2 touchpadxy;
 	//acellerometer
@@ -71,7 +71,7 @@ public class playerinteraction : MonoBehaviour {
 	//the positive energy blast object
 	public GameObject posblastobj;
 
-	private int pmask = (1<< 8)| (1<<11);
+	private int pmask = (1<< 8)| (1<<11) |(1<<9);
 
 	//movement variables
 	private	float direction =0;
@@ -79,6 +79,7 @@ public class playerinteraction : MonoBehaviour {
 
 	void Awake()
 	{
+	//	maincontrol.rotation = transform.rotation;
 		startcontrollerOR = transform.rotation;
 		currentrecmat = rec.GetComponent<MeshRenderer>().material;
 		startmat = currentrecmat;
@@ -110,11 +111,11 @@ public class playerinteraction : MonoBehaviour {
 		//movement
 		controlleraccel = GvrController.Accel;
 		//controller orientation
-		maincontrol.rotation = controllerOR;
+		maincontrol.localRotation = controllerOR;
 
 
 		//raycast 
-		Debug.DrawRay(diamondfrontpoint.position,diamondfrontpoint.forward * raydistance,Color.red,.5f);
+		Debug.DrawRay(diamondfrontpoint.position,diamondfrontpoint.forward * Mathf.Infinity,Color.red,.5f);
 
 		if(Physics.Raycast(diamondfrontpoint.position,diamondfrontpoint.forward,out rhit,Mathf.Infinity,pmask))
 		{
@@ -155,7 +156,12 @@ public class playerinteraction : MonoBehaviour {
 			case "bulb":
 				bulblookat(hit);
 				break;
-
+			case "jumppoint":
+				newlocationjump(hit);
+				break;
+			case "innerworld":
+				gotocell(hit);
+				break;
 				default:
 				positiveshot (hit);
 				break;
@@ -206,6 +212,12 @@ public class playerinteraction : MonoBehaviour {
 
 	}
 
+	public void gotocell(Transform cellobj)
+	{
+		gmanager.playerobj.transform.position = 	cellobj.parent.transform.GetComponent<cellaction>().arriveincelllocation();
+		gmanager.playerobj.transform.rotation = cellobj.parent.transform.GetComponent<cellaction>().arriveincellrotation();
+	}
+
 	public void resetcellrotation(Transform hitobj)
 	{
 		hitobj.GetComponent<cellaction>().dorotate = false;
@@ -229,9 +241,11 @@ public class playerinteraction : MonoBehaviour {
 		}
 	}
 
-	public void cleansingbulb(Transform bulbobj)
+	public void newlocationjump(Transform jumpobj)
 	{
-
+		//need to add the blink in there later but for now just move around the scene
+		gmanager.playerobj.transform.rotation = jumpobj.GetComponent<jumppointaction>().rotateplayer();
+		gmanager.playerobj.transform.position = jumpobj.GetComponent<jumppointaction>().playerhere();
 
 	}
 

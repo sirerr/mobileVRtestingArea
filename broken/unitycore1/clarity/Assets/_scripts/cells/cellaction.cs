@@ -7,14 +7,13 @@ public class cellaction : MonoBehaviour {
 	public int requiredpower = 10;
 	//returns to the area start point
 	public GameObject returnobj;
+	private Vector3 returnobjlocation;
 	//being looked at
 	public bool acklook;
 	//is the cell completed
 	public bool celldone = false;
 	//the power added by the cells
 	public int addedpower =0;
-	//list of turners
-
 	//spawn location
 	public Transform spawnloc;
 
@@ -32,7 +31,7 @@ public class cellaction : MonoBehaviour {
 	public virtual	void Awake()
 	{
 		defaultrotation = transform.rotation.eulerAngles;
-			
+		returnobjlocation = returnobj.transform.position;
 	}
 
 	public virtual void finishedcell()
@@ -42,6 +41,8 @@ public class cellaction : MonoBehaviour {
 
 	public virtual void Update()
 	{
+		returnobj.transform.position = returnobjlocation;
+
 		if(playerinteraction.lookedatobj == transform.gameObject)
 		{
 			acklook = true;
@@ -90,5 +91,15 @@ public class cellaction : MonoBehaviour {
 	{
 
 
+	}
+
+	public virtual Vector3 arriveincelllocation()
+	{
+		return spawnloc.position;
+	}
+
+	public virtual Quaternion arriveincellrotation()
+	{
+		return spawnloc.rotation;
 	}
 }
