@@ -25,27 +25,70 @@ public class cellaction : MonoBehaviour {
 
 	public bool dorotate = false;
 	public bool gotvalues = false;
-
 	public Vector3 raypoint;
+
+	//objects to create when the scene begins
+	public GameObject elementobj;
+	public GameObject centralobj;
+	public GameObject bulbobj;
+
+	private bool firstlook = false;
 
 	public virtual	void Awake()
 	{
+		//create the elements, centers and bulbs
+		StartCoroutine(populate());
+
 		defaultrotation = transform.rotation.eulerAngles;
 		returnobjlocation = returnobj.transform.position;
 	}
 
+	public virtual IEnumerator populate()
+	{
+
+		for(int i = 0; i<=requiredpower;i++)
+		{
+			GameObject ele = Instantiate(elementobj,transform.position,transform.rotation) as GameObject;
+			ele.transform.parent = transform;
+			yield return new WaitForSeconds(.5f);
+		}
+
+		for(int i = 0; i<5;i++)
+		{
+			GameObject cen = Instantiate(centralobj,transform.position,transform.rotation) as GameObject; 
+			cen.transform.parent = transform;
+			yield return new WaitForSeconds(.5f);
+		}
+
+		int count = Random.Range(1,10);
+		for(int i =0; i<=count;i++)
+		{
+			GameObject bulb = Instantiate(bulbobj,transform.position,transform.rotation) as GameObject;
+			bulb.transform.parent = transform;
+			yield return new WaitForSeconds(.5f);
+		}
+
+	}
+
 	public virtual void finishedcell()
 	{
-		returnobj.SetActive(true);
+	//	returnobj.SetActive(true);
+
+
+
 	}
 
 	public virtual void Update()
 	{
-		returnobj.transform.position = returnobjlocation;
+		//returnobj.transform.position = returnobjlocation;
 
 		if(playerinteraction.lookedatobj == transform.gameObject)
 		{
 			acklook = true;
+			if(!firstlook)
+			{
+				firstlook = true;
+			}
 		}
 		else
 		{
@@ -53,7 +96,7 @@ public class cellaction : MonoBehaviour {
 
 		}
 
-		if(addedpower == requiredpower && !celldone)
+		if(addedpower >= requiredpower && !celldone)
 		{
 			celldone = true;
 			finishedcell();
@@ -90,7 +133,10 @@ public class cellaction : MonoBehaviour {
 	public virtual void leavecell()
 	{
 
-
+		gmanager.playerobj.transform.position = gmanager.lastjumplocation;
+		gmanager.playerobj.transform.rotation = gmanager.lastjumprotation;
+		print(gmanager.lastjumplocation);
+		print(gmanager.lastjumprotation);
 	}
 
 	public virtual Vector3 arriveincelllocation()

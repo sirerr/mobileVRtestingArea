@@ -19,6 +19,8 @@ public class jumppointaction : MonoBehaviour {
 		
 		parenttrans.GetComponent<areamanager>().currentjumpoint = objlistlocationint;
 		gmanager.lastjumplocation = childpoint.position;
+		gmanager.lastjumprotation = childpoint.rotation;
+
 		return childpoint.position;
 	}
 

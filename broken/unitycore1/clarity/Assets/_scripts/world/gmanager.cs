@@ -7,6 +7,7 @@ public class gmanager : MonoBehaviour {
 	public static GameObject playerobj;
 
 	public static Vector3 lastjumplocation;
+	public static Quaternion lastjumprotation;
 
 	void Awake()
 	{

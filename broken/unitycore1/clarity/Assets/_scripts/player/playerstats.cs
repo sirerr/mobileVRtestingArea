@@ -8,10 +8,16 @@ public class playerstats : MonoBehaviour {
 	public static int playerposenergy = 15;
 	public static int playerposenergylimit = 50;
 	public static int playerhealth =10;
+
+
 	void Awake()
 	{
 
 		playerintref = GameObject.FindGameObjectWithTag("controller").GetComponent<playerinteraction>();
+	}
+
+	void Start()
+	{
 
 	}
 		

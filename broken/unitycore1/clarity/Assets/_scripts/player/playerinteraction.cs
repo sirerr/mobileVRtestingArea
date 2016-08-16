@@ -77,6 +77,8 @@ public class playerinteraction : MonoBehaviour {
 	private	float direction =0;
 	private float speed = 1f;
 
+	private bool firstjump = false;
+
 	void Awake()
 	{
 	//	maincontrol.rotation = transform.rotation;
@@ -159,8 +161,11 @@ public class playerinteraction : MonoBehaviour {
 			case "jumppoint":
 				newlocationjump(hit);
 				break;
-			case "innerworld":
+			case "outsphere":
 				gotocell(hit);
+				break;
+			case "returner":
+				leavecell(hit);
 				break;
 				default:
 				positiveshot (hit);
@@ -212,9 +217,22 @@ public class playerinteraction : MonoBehaviour {
 
 	}
 
+	public void leavecell(Transform returner)
+	{
+		playerstate =0;
+		returner.parent.transform.GetComponent<cellaction>().leavecell();
+	}
+
 	public void gotocell(Transform cellobj)
 	{
-		gmanager.playerobj.transform.position = 	cellobj.parent.transform.GetComponent<cellaction>().arriveincelllocation();
+		if(!firstjump)
+		{
+			gmanager.lastjumplocation = gmanager.playerobj.transform.position;
+			gmanager.lastjumprotation = gmanager.playerobj.transform.rotation;
+		}
+
+		playerstate = 1;
+		gmanager.playerobj.transform.position = cellobj.parent.transform.GetComponent<cellaction>().arriveincelllocation();
 		gmanager.playerobj.transform.rotation = cellobj.parent.transform.GetComponent<cellaction>().arriveincellrotation();
 	}
 
@@ -243,6 +261,10 @@ public class playerinteraction : MonoBehaviour {
 
 	public void newlocationjump(Transform jumpobj)
 	{
+		if(!firstjump){
+		firstjump = true;
+		}
+
 		//need to add the blink in there later but for now just move around the scene
 		gmanager.playerobj.transform.rotation = jumpobj.GetComponent<jumppointaction>().rotateplayer();
 		gmanager.playerobj.transform.position = jumpobj.GetComponent<jumppointaction>().playerhere();
@@ -283,10 +305,12 @@ public class playerinteraction : MonoBehaviour {
 
 	public void elementcollector(Transform obj)
 	{
-		if(playerstats.playerposenergy>playerstats.playerposenergylimit)
+		print(playerstats.playerposenergy);
+		print(playerstats.playerposenergylimit);
+		if(playerstats.playerposenergy<playerstats.playerposenergylimit)
 		{
 			elementcolection.Add(obj.gameObject);
-
+			print("working");
 			obj.GetComponent<elementaction>().collected(collectpoint);
 			elementintcount++;
 		}
@@ -302,7 +326,7 @@ public class playerinteraction : MonoBehaviour {
 		{
 			centercollected = hit.gameObject;
 			hit.GetComponent<centralaction>().grabbed(centercollectpoint);
-			playerstate =1;
+
 		}else if(centeractref.centralstate ==1 && !centeractref.fullpower) {
 
 			if(elementintcount>0)

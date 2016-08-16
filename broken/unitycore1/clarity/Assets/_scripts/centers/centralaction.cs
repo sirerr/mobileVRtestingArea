@@ -132,7 +132,7 @@ public class centralaction : MonoBehaviour {
 	public virtual void Update()
 	{
 
-		if(collectedpower == neededpower)
+		if(collectedpower >= neededpower)
 		{
 			fullpower = true;
 			poweredup();

@@ -20,11 +20,11 @@ public class elementaction : MonoBehaviour {
 	private MeshRenderer meshren;
 
 	public int elementpower = 0;
-
+	public int elementhighlimit = 0;
 	public bool acklook = false;
 	public float vel = 5f;
 
-	void OnEnable()
+	public virtual	void OnEnable()
 	{
 		col = GetComponent<Collider>();
 		rbody = GetComponent<Rigidbody>();
@@ -38,6 +38,20 @@ public class elementaction : MonoBehaviour {
 		{
 			meshren.material = puremat;
 		}
+	}
+
+	public virtual void Awake()
+	{
+		elementpower = Random.Range(0,elementhighlimit);
+
+		rbody = GetComponent<Rigidbody>();
+		col = GetComponent<Collider>();
+
+		rbody.constraints = RigidbodyConstraints.None;
+		float ranx = Random.Range(-5,5);
+		float rany = Random.Range(-5,5);
+		float ranz = Random.Range(-5,5);
+		rbody.AddForce(ranx,rany,ranz);
 	}
 
  
@@ -64,7 +78,8 @@ public class elementaction : MonoBehaviour {
 			col.enabled = false;
 			meshren.enabled = false;
 			rbody.isKinematic = true;
-		
+			transform.parent =null;
+			transform.parent = point;
 			captured =true;
 		}
 
