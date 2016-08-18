@@ -75,10 +75,12 @@ public class centralaction : MonoBehaviour {
 				transform.GetChild(i).gameObject.SetActive(false);
 			}
 			centralstate =0;
-		}else if (centralstate==1 &&fullpower)
-		{
-			StartCoroutine(centralstatewait());
 		}
+
+//		else if (centralstate==1 &&fullpower)
+//		{
+//			StartCoroutine(centralstatewait());
+//		}
 	}
 
 	IEnumerator centralstatewait()
@@ -125,14 +127,14 @@ public class centralaction : MonoBehaviour {
 	public virtual void poweredup()
 	{
 		//do action when fully powered
-	
+		StartCoroutine(centralstatewait());
 		rbody.AddForce(Vector3.zero);
 	}
 
 	public virtual void Update()
 	{
 
-		if(collectedpower >= neededpower)
+		if(collectedpower >= neededpower && !fullpower )
 		{
 			fullpower = true;
 			poweredup();

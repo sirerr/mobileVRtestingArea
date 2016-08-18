@@ -35,7 +35,7 @@ public class bulbaction : MonoBehaviour {
 	public void absorbed()
 	{
 		playerstats.playerposenergy += bulbpower;
-		print(playerstats.playerposenergy);
+	//	print(playerstats.playerposenergy);
 		// will make it reappear different places 
 
 		//for now

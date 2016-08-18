@@ -138,10 +138,13 @@ public class playerinteraction : MonoBehaviour {
 		{
 			raybox.SetActive (false);
 			point = null;
+			hit = null;
+			lookedatobj = null;
+
 		}
 		//raycast
 
-		if(appbuttonpress)
+		if(appbuttonpress && hit!=null)
 		{
 			switch (hit.tag)
 			{
@@ -167,14 +170,13 @@ public class playerinteraction : MonoBehaviour {
 			case "returner":
 				leavecell(hit);
 				break;
-				default:
+			case "enemy":
 				positiveshot (hit);
 				break;
-			
 			}
 		}
 
-		if(clickpress)
+		if(clickpress && hit!=null)
 		{
 			switch(hit.tag)
 			{
@@ -186,7 +188,7 @@ public class playerinteraction : MonoBehaviour {
 			}
 		}
 
-		if (clickpressup)
+		if (clickpressup && hit!=null)
 		{
 			switch(hit.tag)
 			{
@@ -196,7 +198,7 @@ public class playerinteraction : MonoBehaviour {
 			}
 		}
 
-		if(touchpaddown)
+		if(touchpaddown && hit!=null)
 		{
 
 			switch(hit.tag)
@@ -310,7 +312,7 @@ public class playerinteraction : MonoBehaviour {
 		if(playerstats.playerposenergy<playerstats.playerposenergylimit)
 		{
 			elementcolection.Add(obj.gameObject);
-			print("working");
+		//	print("working");
 			obj.GetComponent<elementaction>().collected(collectpoint);
 			elementintcount++;
 		}

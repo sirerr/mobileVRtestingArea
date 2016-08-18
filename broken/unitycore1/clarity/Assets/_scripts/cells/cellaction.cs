@@ -135,8 +135,8 @@ public class cellaction : MonoBehaviour {
 
 		gmanager.playerobj.transform.position = gmanager.lastjumplocation;
 		gmanager.playerobj.transform.rotation = gmanager.lastjumprotation;
-		print(gmanager.lastjumplocation);
-		print(gmanager.lastjumprotation);
+//		print(gmanager.lastjumplocation);
+//		print(gmanager.lastjumprotation);
 	}
 
 	public virtual Vector3 arriveincelllocation()
