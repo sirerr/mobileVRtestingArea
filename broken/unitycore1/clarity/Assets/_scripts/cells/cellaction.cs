@@ -34,8 +34,12 @@ public class cellaction : MonoBehaviour {
 
 	private bool firstlook = false;
 
+	public GameObject cellskinobj;
+	private Color finishedcellskin;
+
 	public virtual	void Awake()
 	{
+		finishedcellskin = Color.cyan;
 		//create the elements, centers and bulbs
 		StartCoroutine(populate());
 
@@ -74,7 +78,7 @@ public class cellaction : MonoBehaviour {
 	{
 	//	returnobj.SetActive(true);
 
-
+		cellskinobj.GetComponent<MeshRenderer>().material.color = finishedcellskin;
 
 	}
 

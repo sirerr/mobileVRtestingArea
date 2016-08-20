@@ -6,6 +6,9 @@ public class areamanager : MonoBehaviour {
 
 	// player will always start at jump point 0
 
+	public int parentlevelint;
+	public int areaint;
+
 	public int currentjumpoint = 0;
 
 	public List <GameObject> jumplocs = new List<GameObject>();
