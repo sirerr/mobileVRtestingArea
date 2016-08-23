@@ -6,6 +6,9 @@ public class areamanager : MonoBehaviour {
 
 	// player will always start at jump point 0
 
+	public List <Transform> poolareas = new List<Transform>();
+	public Transform enemyspawnpoint;
+
 	public int parentlevelint;
 	public int areaint;
 

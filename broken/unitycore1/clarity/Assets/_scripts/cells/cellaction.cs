@@ -37,6 +37,8 @@ public class cellaction : MonoBehaviour {
 	public GameObject cellskinobj;
 	private Color finishedcellskin;
 
+	private GameObject makerobj;
+
 	public virtual	void Awake()
 	{
 		finishedcellskin = Color.cyan;
@@ -49,18 +51,21 @@ public class cellaction : MonoBehaviour {
 
 	public virtual IEnumerator populate()
 	{
+		makerobj = new GameObject("maker");
+		makerobj.transform.position = transform.position;
+
 
 		for(int i = 0; i<=requiredpower;i++)
 		{
 			GameObject ele = Instantiate(elementobj,transform.position,transform.rotation) as GameObject;
-			ele.transform.parent = transform;
+			ele.transform.parent = makerobj.transform;
 			yield return new WaitForSeconds(.5f);
 		}
 
 		for(int i = 0; i<5;i++)
 		{
 			GameObject cen = Instantiate(centralobj,transform.position,transform.rotation) as GameObject; 
-			cen.transform.parent = transform;
+			cen.transform.parent = makerobj.transform;
 			yield return new WaitForSeconds(.5f);
 		}
 
@@ -68,7 +73,7 @@ public class cellaction : MonoBehaviour {
 		for(int i =0; i<=count;i++)
 		{
 			GameObject bulb = Instantiate(bulbobj,transform.position,transform.rotation) as GameObject;
-			bulb.transform.parent = transform;
+			bulb.transform.parent = makerobj.transform;
 			yield return new WaitForSeconds(.5f);
 		}
 

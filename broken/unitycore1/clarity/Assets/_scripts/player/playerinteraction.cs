@@ -173,6 +173,9 @@ public class playerinteraction : MonoBehaviour {
 			case "enemy":
 				positiveshot (hit);
 				break;
+			case "helperA":
+				positiveshot(hit);
+				break;
 			}
 		}
 
@@ -295,6 +298,7 @@ public class playerinteraction : MonoBehaviour {
 		if(centercollected!=null)
 		{
 			centercollected.GetComponent<centralaction>().tohole(obj);
+			centercollected.transform.parent = obj;
 			centercollected = null;
 		}
 	}
