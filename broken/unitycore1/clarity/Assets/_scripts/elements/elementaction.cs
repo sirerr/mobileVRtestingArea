@@ -93,6 +93,13 @@ public class elementaction : MonoBehaviour {
 			meshren.material = puremat;
 		}
 	}
+
+	public virtual void corruptelement()
+	{
+		purestate = false;
+		meshren.material = badmat;
+
+	}
 		
 	public virtual void letloose(Vector3 par)
 	{
