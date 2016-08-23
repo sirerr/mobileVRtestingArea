@@ -22,6 +22,7 @@ public class enemyaction : MonoBehaviour {
 		if(statsref.ehealth <=0)
 		{
 			Instantiate(dropobject,transform.position,transform.rotation);
+			statsref.currentarea.GetComponent<areaenemycontrol>().enemylist.Remove(transform.gameObject);
 			Destroy(gameObject);
 		}
 	}

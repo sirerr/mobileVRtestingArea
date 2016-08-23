@@ -6,8 +6,7 @@ public class areamanager : MonoBehaviour {
 
 	// player will always start at jump point 0
 
-	public List <Transform> poolareas = new List<Transform>();
-	public Transform enemyspawnpoint;
+	private areaenemycontrol enemycontrolref;
 
 	public int parentlevelint;
 	public int areaint;
@@ -20,6 +19,8 @@ public class areamanager : MonoBehaviour {
 
 	void Awake()
 	{
+		enemycontrolref = GetComponent<areaenemycontrol>();
+
 		childcountint = transform.childCount;
 		for(int i =0; i<childcountint;i++)
 		{
@@ -29,9 +30,15 @@ public class areamanager : MonoBehaviour {
 				jumplocs[i].GetComponent<jumppointaction>().objlistlocationint = i;
 			}
 		}
+	
 	}
 
- 
+
+	void Update()
+	{
+		
+	}
+
 
 
 }

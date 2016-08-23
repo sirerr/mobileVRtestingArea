@@ -6,4 +6,5 @@ public class enemystats : MonoBehaviour {
 	public int ehealth = 0;
 	public int enemypower = 0;
 
+	public Transform currentarea;
 }
