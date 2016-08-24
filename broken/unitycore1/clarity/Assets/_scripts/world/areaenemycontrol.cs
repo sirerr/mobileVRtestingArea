@@ -47,23 +47,29 @@ public class areaenemycontrol : MonoBehaviour {
 	IEnumerator enemyreleasewait()
 	{
 		yield return new WaitForSeconds(2f);
-		releaseenemies();
+
+		for(int i =1;i<=enemycount;i++)
+		{
+			releaseenemies();
+			yield return new WaitForSeconds(.3f);
+		}
+
 	}
 
 	private void releaseenemies()
 	{
 		//test code
-		GameObject tester = Instantiate(enemyobj,enemyspawnpoint.position,Quaternion.identity) as GameObject;
-		tester.GetComponent<enemystats>().currentarea = transform;
-		for(int i =0;i<poolareas.Count;i++)
-		{
-			tester.GetComponent<enemyAI>().pooltargets.Add(poolareas[i]);
-		}
 
-		enemylist.Add(tester);
+			GameObject tester = Instantiate(enemyobj,enemyspawnpoint.position,Quaternion.identity) as GameObject;
+			tester.GetComponent<enemystats>().currentarea = transform;
+			for(int a =0;a<poolareas.Count;a++)
+			{
+				tester.GetComponent<enemyAI>().pooltargets.Add(poolareas[a]);
+			}
+			tester.GetComponent<enemyAI>().newlocation();
+			enemylist.Add(tester);
+
 		//test code
-
-
 	}
 
 

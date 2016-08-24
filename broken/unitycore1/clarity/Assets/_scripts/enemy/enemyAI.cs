@@ -17,7 +17,7 @@ public class enemyAI : MonoBehaviour {
 
 
 	// the states of the enemy
-	private int enemystate=0;
+	public int enemystate=0;
 	private int poolint =0;
 	public bool busy = false;
 
@@ -26,16 +26,18 @@ public class enemyAI : MonoBehaviour {
 	//raycasthit
 	private RaycastHit hit;
 	public Transform enemyfront;
+//	private int emask = (1<< 8);
+	private float TimePerPoolLocation =0;
+	public float TimeLimitPerPoolLocation = 3;
+	private float TimePerImportantLocation =0;
+	public float TimeLimitPerImportantLocation = 2;
 
-	private float timeperlocation =0;
-	public float timelimitperlocation = 5;
 
 	void OnEnable()
 	{
 		statsref = GetComponent<enemystats>();
 		poolsafedistance = Random.Range(5,20);
-		print(poolsafedistance);
-		newlocation();
+	//	print(poolsafedistance);
 		startrotation = transform.rotation;
 
 	}
@@ -52,14 +54,16 @@ public class enemyAI : MonoBehaviour {
 		case 0:
 			//start state
 
-			if(importanttargets.Count ==0 &&!busy)
+			if(importanttargets.Count ==0 && !busy)
 			{
 				movetopoolarea();
 			}
-			else
+			else if(importanttargets.Count>0 && !busy)
 			{
 				enemystate = 1;
-				busy = true;
+			}else if(busy)
+			{
+				enemystate = 5;
 			}
 		
 			break;
@@ -69,55 +73,72 @@ public class enemyAI : MonoBehaviour {
 
 			break;
 		case 2:
-			raycastobj = true;
-
+			enemybyobject();
 			//action on important object
 			break;
 		case 3:
 			//player point
+			//move to player point
 			break;
 		case 4:
-			enemystate =0;
-			//done at point
+		//	print("back to 0");
+			TimePerImportantLocation+= Time.deltaTime;
+			transform.LookAt(importanttargets[0].position);
+			//will wait for a few seconds then make the enemy go somewhere else
+			if(TimePerImportantLocation>TimeLimitPerImportantLocation)
+			{
+				importanttargets.Remove(importanttargets[0]);
+				enemystate = 0;
+			}
+			break;
+		case 5:
+			if(!busy)
+			{
+				enemystate =0;
+			}
 			break;
 		case 10:
+
+	
+		//	print("in 10 state");
 			//paused, not moving at all
 			//animation only
 			break;
 
 		}
+	}
 
-		if(raycastobj)
+
+	public void enemybyobject()
+	{
+		switch(importanttargets[0].tag)
 		{
-			if(Physics.Raycast(enemyfront.position,enemyfront.forward,out hit,Mathf.Infinity,LayerMask.NameToLayer("incell")))
-				{
-				Transform transhit = hit.transform;
-				print("raycast worked");
-				switch (transhit.tag)
-				{
-				case "element":
-					elementchange(transhit);
-					break;
-				case "corecenter":
-					centerchange(transhit);
-					break;
-
-				}
-				}
+		case "element":
+			elementchange();
+			break;
+		case "corecenter":
+			centerchange();
+			break;
 		}
-
-
 	}
 
 
 	public void movetoimportantobject()
 	{
 		float distance = Vector3.Distance(transform.position,importanttargets[0].position);
+		elementaction eleref = importanttargets[0].GetComponent<elementaction>();
 
-		if(distance>worldsafedistance)
+		if(distance>worldsafedistance && (eleref.purestate && !eleref.captured))
 		{
 			transform.LookAt(importanttargets[0].position);
 			transform.position = Vector3.MoveTowards(transform.position,importanttargets[0].position,movespeed *Time.deltaTime);
+
+			if(busy)
+			{
+				enemystate =5;
+				return;
+			}
+		
 		}else
 		{
 			enemystate =2;
@@ -126,17 +147,23 @@ public class enemyAI : MonoBehaviour {
 	}
 
 
-	public void elementchange(Transform elementhit)
+	public void elementchange()
 	{
-		//set time in here to convert it over time, not just automatically
-		raycastobj = false;
-		elementhit.GetComponent<elementaction>().corruptelement();
-		busy = false;
-		importanttargets.Remove(importanttargets[0]);
-		enemystate = 4;
+		elementaction eleref = importanttargets[0].GetComponent<elementaction>();
+
+		if(eleref.purestate)
+		{
+			eleref.corruptelement();
+			TimePerImportantLocation = 0;
+			enemystate =4;
+		}else
+		{
+			enemystate =0;
+			importanttargets.Remove(importanttargets[0]);
+		}
 	}
 
-	public void centerchange(Transform centerhit)
+	public void centerchange()
 	{}
 
 	public void movetopoolarea()
@@ -149,7 +176,22 @@ public class enemyAI : MonoBehaviour {
 			transform.position = Vector3.MoveTowards(transform.position,pooltargets[poolint].position,movespeed *Time.deltaTime);
 		}else
 		{
-			transform.rotation =startrotation;
+			TimePerPoolLocation +=Time.deltaTime;
+		//	transform.rotation =startrotation;
+			if(TimePerPoolLocation>TimeLimitPerPoolLocation)
+			{
+
+				TimePerPoolLocation =0;
+				if(poolint ==pooltargets.Count -1)
+				{
+					poolint =0;
+				}else
+				{
+					int temppoolint  = Random.Range(0,pooltargets.Count-1);
+					poolint = temppoolint;
+				}
+
+			}
 		}
 	}
 
