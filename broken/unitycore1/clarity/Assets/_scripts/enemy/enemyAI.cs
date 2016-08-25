@@ -6,6 +6,7 @@ public class enemyAI : MonoBehaviour {
 
 	private bool raycastobj = false;
 	public enemystats statsref;
+	public areaenemycontrol areacontrolref;
 	public  List <Transform> pooltargets = new List<Transform>();
 	public List <Transform> importanttargets = new List<Transform>();
 	//
@@ -87,7 +88,12 @@ public class enemyAI : MonoBehaviour {
 			//will wait for a few seconds then make the enemy go somewhere else
 			if(TimePerImportantLocation>TimeLimitPerImportantLocation)
 			{
+				if(areaenemycontrol.importantobjs.Find(obj=>obj.gameObject == importanttargets[0]) != null)
+				{
+					areaenemycontrol.importantobjs.Remove(importanttargets[0].gameObject);
+				}
 				importanttargets.Remove(importanttargets[0]);
+				print("taken care of");
 				enemystate = 0;
 			}
 			break;
@@ -159,7 +165,12 @@ public class enemyAI : MonoBehaviour {
 		}else
 		{
 			enemystate =0;
+			if(areaenemycontrol.importantobjs.Find(obj=>obj.gameObject == importanttargets[0]) != null)
+			{
+				areaenemycontrol.importantobjs.Remove(importanttargets[0].gameObject);
+			}
 			importanttargets.Remove(importanttargets[0]);
+			print("already pure!");
 		}
 	}
 

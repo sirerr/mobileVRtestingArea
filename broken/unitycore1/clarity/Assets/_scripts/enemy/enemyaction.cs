@@ -4,21 +4,26 @@ using System.Collections;
 public class enemyaction : MonoBehaviour {
 
 	public GameObject dropobject;
-	private float childtimeactive = 5;
+	private float childtimeactive = 3;
 	private float childwaittime = 15;
 	private float childactivetimer =0;
 	private enemystats statsref;
 	private enemyAI airef;
-	private GameObject childcol;
+	public areaenemycontrol enemycontrolref;
+	public  GameObject childcol;
 
+	public bool makechildactive = false;
+
+	//safe
 	public virtual void Awake()
 	{
 		
 		statsref = GetComponent<enemystats>();
 		airef = GetComponent<enemyAI>();
 		childcol = transform.GetChild(0).gameObject;
+		childcol.SetActive(false);
 	}
-
+	//safe
 	public virtual void OnCollisionEnter(Collision col)
 	{
 		if(col.gameObject.CompareTag("pattack"))
@@ -29,26 +34,39 @@ public class enemyaction : MonoBehaviour {
 
 		if(statsref.ehealth <=0)
 		{
-			Instantiate(dropobject,transform.position,transform.rotation);
-			statsref.currentarea.GetComponent<areaenemycontrol>().enemylist.Remove(transform.gameObject);
-			Destroy(gameObject);
+			enemydeath();
 		}
+	}
+
+	public virtual void enemydeath()
+	{
+		Instantiate(dropobject,transform.position,transform.rotation);
+		enemycontrolref.enemylist.Remove(transform.gameObject);
+		enemycontrolref.enemyactionref.Remove(GetComponent<enemyaction>());
+		Destroy(gameObject);
 	}
 
 	protected void Update()
 	{
+
+		if(makechildactive)
+		{
+			childdectection();
+		}
+	}
+
+	public virtual void childdectection()
+	{
+		childcol.SetActive(true);
 		childactivetimer += Time.deltaTime;
 
 		if(childactivetimer>childtimeactive)
 		{
+		//	print("time active " + childactivetimer);
 			childcol.SetActive(false);
-			if(childactivetimer>childwaittime)
-			{
-				childcol.SetActive(true);
-				childactivetimer = 0;
-			}
+			childactivetimer = 0;
+			makechildactive = false;
 		}
-
 	}
 
 
@@ -57,10 +75,14 @@ public class enemyaction : MonoBehaviour {
 		switch(col.tag)
 		{
 		case "element":
-		//	print("saw element");
-			if(col.GetComponent<elementaction>().purestate && !col.GetComponent<elementaction>().captured)
+			//	print("saw element");
+			elementaction eleref = col.GetComponent<elementaction>();
+			if(eleref.purestate && !eleref.captured)
 			{
-				airef.importanttargets.Add(col.transform);
+				print ("found one!!!");
+				enemycontrolref.newfind = true;
+				areaenemycontrol.importantobjs.Add(eleref.gameObject);
+				//	airef.importanttargets.Add(col.transform);
 			}
 
 			break;
@@ -68,7 +90,9 @@ public class enemyaction : MonoBehaviour {
 		//	print("saw corecenter");
 			if(col.GetComponent<centralaction>().fullpower)
 			{
-				airef.importanttargets.Add(col.transform);
+			
+
+				//	airef.importanttargets.Add(col.transform);
 			}
 			break;
 		}

@@ -58,6 +58,16 @@ public class cellaction : MonoBehaviour {
 		for(int i = 0; i<=requiredpower;i++)
 		{
 			GameObject ele = Instantiate(elementobj,transform.position,transform.rotation) as GameObject;
+			//very temporary
+			int a = Random.Range(0,1);
+			if(a ==0)
+			{
+				ele.GetComponent<elementaction>().purestate = true;
+			}else
+			{
+				ele.GetComponent<elementaction>().purestate = false;
+			}
+			//very temporary
 			ele.transform.parent = makerobj.transform;
 			yield return new WaitForSeconds(.5f);
 		}
