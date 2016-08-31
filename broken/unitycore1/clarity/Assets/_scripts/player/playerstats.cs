@@ -4,8 +4,8 @@ using System.Collections;
 public class playerstats : MonoBehaviour {
 
 	public playerinteraction playerintref;
-
-	public static int playerposenergy = 15;
+	//public Transform mainplayer;
+	public static int playerposenergy = 50;
 	public static int playerposenergylimit = 50;
 	public static int playerhealth =10;
 
@@ -14,6 +14,7 @@ public class playerstats : MonoBehaviour {
 	{
 
 		playerintref = GameObject.FindGameObjectWithTag("controller").GetComponent<playerinteraction>();
+	//	mainplayer = GameObject.FindGameObjectWithTag("Player").transform;
 	}
 
 	void Start()

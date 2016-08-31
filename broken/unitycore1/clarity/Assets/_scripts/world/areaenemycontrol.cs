@@ -23,8 +23,13 @@ public class areaenemycontrol : MonoBehaviour {
 	public GameObject enemyobj;
 
 	//important locations
-	public static List<GameObject> importantobjs = new List<GameObject>();
-	public static int importantobjcount = 0;
+	/// <summary>
+	/// these used to be static locations
+	/// </summary>
+	public  List<GameObject> importantobjs = new List<GameObject>();
+	public  int importantobjcount = 0;
+
+
 	public bool newfind = false;
 	public int enemycallamount = 5;
 	private float calltimer = 0;

@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class playerattackaction : MonoBehaviour {
+public class enemyattackaction : MonoBehaviour {
 
-	public float speed =10;
+	public float speed =5;
 	Rigidbody rbody;
 
 
@@ -18,5 +18,4 @@ public class playerattackaction : MonoBehaviour {
 		rbody = GetComponent<Rigidbody>();
 		rbody.velocity = speed * transform.forward;
 	}
-
 }

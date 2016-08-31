@@ -20,7 +20,7 @@ public class areamanager : MonoBehaviour {
 	void Awake()
 	{
 		enemycontrolref = GetComponent<areaenemycontrol>();
-
+		gmanager.currentarea = transform.gameObject;
 		childcountint = transform.childCount;
 		for(int i =0; i<childcountint;i++)
 		{

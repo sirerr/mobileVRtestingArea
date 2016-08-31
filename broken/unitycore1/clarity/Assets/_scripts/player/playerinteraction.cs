@@ -71,7 +71,7 @@ public class playerinteraction : MonoBehaviour {
 	//the positive energy blast object
 	public GameObject posblastobj;
 
-	private int pmask = (1<< 8)| (1<<11) |(1<<9);
+	private int pmask = (1<< 8)| (1<<11) |(1<<9 | (1<<12));
 
 	//movement variables
 	private	float direction =0;
