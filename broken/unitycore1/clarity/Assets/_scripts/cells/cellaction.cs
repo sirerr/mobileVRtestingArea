@@ -38,6 +38,7 @@ public class cellaction : MonoBehaviour {
 	private Color finishedcellskin;
 
 	private GameObject makerobj;
+	public areamanager areamanagerref;
 
 	public virtual	void Awake()
 	{
@@ -47,6 +48,8 @@ public class cellaction : MonoBehaviour {
 
 		defaultrotation = transform.rotation.eulerAngles;
 		returnobjlocation = returnobj.transform.position;
+
+		requiredpower = Random.Range(10,13);
 	}
 
 	public virtual IEnumerator populate()
@@ -94,7 +97,7 @@ public class cellaction : MonoBehaviour {
 	//	returnobj.SetActive(true);
 
 		cellskinobj.GetComponent<MeshRenderer>().material.color = finishedcellskin;
-
+		areamanagerref.completearealevelamount += requiredpower;
 	}
 
 	public virtual void Update()
