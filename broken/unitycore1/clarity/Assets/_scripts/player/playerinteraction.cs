@@ -15,7 +15,7 @@ public class playerinteraction : MonoBehaviour {
 	private Vector2 touchpadxy;
 	//acellerometer
 	private Vector3 controlleraccel;
-	//app button pressed
+	//app button press
 	public bool appbuttonpress = false;
 	// touchpad touch
 	public bool touchpaddown = false;
@@ -23,6 +23,8 @@ public class playerinteraction : MonoBehaviour {
 	public bool clickpress = false;
 	//click button up
 	public bool clickpressup = false;
+	//app button being pressed
+	public bool appbuttoncontinuedpress = false;
 
 	//recticle
 	public Transform rec;
@@ -42,6 +44,9 @@ public class playerinteraction : MonoBehaviour {
 	public RaycastHit rhit;
 	//raycast distance
 	public float raydistance = 100f;
+	private float raygatherdistance =3f;
+	private float raydistancetemp =0;
+
 	//distance from hit
 	public float hitdistance=0;
 	//hit value
@@ -78,6 +83,11 @@ public class playerinteraction : MonoBehaviour {
 	private float speed = 1f;
 
 	private bool firstjump = false;
+	//determine if the button has been held down long enough to enable gatherer
+	private float holdappbuttontime =0;
+	public float holdappbuttontimelimit = 3;
+	//will change when loading is down but always on for now
+	public bool areaready = true;
 
 	void Awake()
 	{
@@ -86,6 +96,7 @@ public class playerinteraction : MonoBehaviour {
 		currentrecmat = rec.GetComponent<MeshRenderer>().material;
 		startmat = currentrecmat;
 		startmat.color = currentrecmat.color;
+		raydistancetemp = raydistance;
 	}
 
 	void OnEnable()
@@ -104,6 +115,7 @@ public class playerinteraction : MonoBehaviour {
 		touchpaddown = GvrController.TouchDown;
 		clickpress = GvrController.ClickButton;
 		clickpressup = GvrController.ClickButtonUp;
+		appbuttoncontinuedpress = GvrController.AppButton;
 
 		//old code isn't used
 		direction = touchpadxy.y * 10;
@@ -117,9 +129,9 @@ public class playerinteraction : MonoBehaviour {
 
 
 		//raycast 
-		Debug.DrawRay(diamondfrontpoint.position,diamondfrontpoint.forward * Mathf.Infinity,Color.red,.5f);
+	//	Debug.DrawRay(diamondfrontpoint.position,diamondfrontpoint.forward * Mathf.Infinity,Color.red,.5f);
 
-		if(Physics.Raycast(diamondfrontpoint.position,diamondfrontpoint.forward,out rhit,Mathf.Infinity,pmask))
+		if(Physics.Raycast(diamondfrontpoint.position,diamondfrontpoint.forward,out rhit,raydistance,pmask) && areaready)
 		{
 				hit = rhit.transform;
 				raybox.SetActive(true);
@@ -179,6 +191,21 @@ public class playerinteraction : MonoBehaviour {
 			}
 		}
 
+		if(appbuttoncontinuedpress && hit!=null)
+		{
+			switch(hit.tag)
+			{
+			case "cell":
+				holdappbuttontime +=Time.deltaTime;
+				print(holdappbuttontime);
+				if(holdappbuttontime>holdappbuttontimelimit)
+				{
+					gatherobjects(hit);
+				}
+				break;
+			}
+		}
+
 		if(clickpress && hit!=null)
 		{
 			switch(hit.tag)
@@ -222,6 +249,12 @@ public class playerinteraction : MonoBehaviour {
 
 	}
 
+	public void gatherobjects(Transform cellhit)
+	{
+		cellhit.GetComponent<cellaction>().talktomaker();
+		holdappbuttontime = 0;
+	}
+
 	public void leavecell(Transform returner)
 	{
 		playerstate =0;
@@ -230,6 +263,7 @@ public class playerinteraction : MonoBehaviour {
 
 	public void gotocell(Transform cellobj)
 	{
+		
 		if(!firstjump)
 		{
 			gmanager.lastjumplocation = gmanager.playerobj.transform.position;
@@ -311,15 +345,21 @@ public class playerinteraction : MonoBehaviour {
 
 	public void elementcollector(Transform obj)
 	{
-		print(playerstats.playerposenergy);
-		print(playerstats.playerposenergylimit);
-		if(playerstats.playerposenergy<playerstats.playerposenergylimit)
+	//	print(playerstats.playerposenergy);
+	//	print(playerstats.playerposenergylimit);
+//		if(playerstats.playerposenergy<playerstats.playerposenergylimit)
+//		{
+//
+//		}
+
+		if(obj.GetComponent<elementaction>().purestate)
 		{
-			elementcolection.Add(obj.gameObject);
-		//	print("working");
 			obj.GetComponent<elementaction>().collected(collectpoint);
+			elementcolection.Add(obj.gameObject);
 			elementintcount++;
 		}
+
+
 
 	}
 		

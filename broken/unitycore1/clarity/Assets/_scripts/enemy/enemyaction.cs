@@ -46,6 +46,11 @@ public class enemyaction : MonoBehaviour {
 		{
 			enemydeath();
 		}
+
+		if(col.transform.CompareTag("helperA"))
+		{print("it happened");
+			enemydeath();
+		}
 	}
 
 	public virtual void enemydeath()

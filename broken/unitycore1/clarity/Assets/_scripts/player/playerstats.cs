@@ -5,7 +5,7 @@ public class playerstats : MonoBehaviour {
 
 	public playerinteraction playerintref;
 	//public Transform mainplayer;
-	public static int playerposenergy = 50;
+	public static int playerposenergy = 10;
 	public static int playerposenergylimit = 50;
 	public static int playerhealth =10;
 

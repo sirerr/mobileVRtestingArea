@@ -26,12 +26,13 @@ public class centralaction : MonoBehaviour {
 	private bool setinhole = false;
 	//the first child object the outer area
 	private GameObject outerarea;
+	private MeshRenderer meshren;
 
 	public virtual void Awake()
 	{	
 		rbody = GetComponent<Rigidbody>();
 		col = GetComponent<Collider>();
-
+		meshren = GetComponent<MeshRenderer>();
 		rbody.constraints = RigidbodyConstraints.None;
 		float ranx = Random.Range(-5,5);
 		float rany = Random.Range(-5,5);
@@ -47,6 +48,7 @@ public class centralaction : MonoBehaviour {
 		setinhole = true;
 		Vector3 dir = (holepoint.position - transform.position) *vel;
 		rbody.velocity = dir;
+		meshren.enabled = true;
 		rbody.isKinematic = false;
 		int childs = transform.childCount;
 		for(int i=0;i<childs;i++)
@@ -99,6 +101,7 @@ public class centralaction : MonoBehaviour {
 			rbody.constraints = RigidbodyConstraints.FreezeAll;
 			rbody.isKinematic = true;
 			transform.position = centercollect.position;
+			meshren.enabled = false;
 			int childs = transform.childCount;
 			for(int i=0;i<childs;i++)
 			{

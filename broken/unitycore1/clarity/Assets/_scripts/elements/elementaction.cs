@@ -24,21 +24,6 @@ public class elementaction : MonoBehaviour {
 	public bool acklook = false;
 	public float vel = 5f;
 
-	public virtual	void OnEnable()
-	{
-		col = GetComponent<Collider>();
-		rbody = GetComponent<Rigidbody>();
-		meshren = GetComponent<MeshRenderer>();
-
-		if(!purestate)
-		{
-			meshren.material = badmat;
-		}
-		else
-		{
-			meshren.material = puremat;
-		}
-	}
 
 	public virtual void Awake()
 	{
@@ -52,6 +37,17 @@ public class elementaction : MonoBehaviour {
 		float rany = Random.Range(-5,5);
 		float ranz = Random.Range(-5,5);
 		rbody.AddForce(ranx,rany,ranz);
+
+		meshren = GetComponent<MeshRenderer>();
+
+		if(!purestate)
+		{
+			meshren.material = badmat;
+		}
+		else
+		{
+			meshren.material = puremat;
+		}
 	}
 
  
@@ -71,8 +67,7 @@ public class elementaction : MonoBehaviour {
 
 	public virtual void collected(Transform point)
 	{
-		if(purestate)
-		{
+
 			transform.position = point.position;
 
 			col.enabled = false;
@@ -81,7 +76,6 @@ public class elementaction : MonoBehaviour {
 			transform.parent =null;
 			transform.parent = point;
 			captured =true;
-		}
 
 	}
 

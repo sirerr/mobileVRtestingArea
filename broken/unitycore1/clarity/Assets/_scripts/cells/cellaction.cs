@@ -38,7 +38,12 @@ public class cellaction : MonoBehaviour {
 	private Color finishedcellskin;
 
 	private GameObject makerobj;
+	private cellmakeraction makeractionref;
 	public areamanager areamanagerref;
+	public Transform floorpointer;
+
+
+
 
 	public virtual	void Awake()
 	{
@@ -50,11 +55,16 @@ public class cellaction : MonoBehaviour {
 		returnobjlocation = returnobj.transform.position;
 
 		requiredpower = Random.Range(10,13);
+
+
 	}
 
 	public virtual IEnumerator populate()
 	{
 		makerobj = new GameObject("maker");
+		makerobj.AddComponent<cellmakeraction>();
+		makeractionref = makerobj.GetComponent<cellmakeraction>();
+
 		makerobj.transform.position = transform.position;
 
 
@@ -90,6 +100,11 @@ public class cellaction : MonoBehaviour {
 			yield return new WaitForSeconds(.5f);
 		}
 
+	}
+
+	public void talktomaker()
+	{
+		makeractionref.gatherchildren();
 	}
 
 	public virtual void finishedcell()

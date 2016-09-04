@@ -13,7 +13,8 @@ public class areamanager : MonoBehaviour {
 
 	public int currentjumpoint = 0;
 
-	public int completearealevelamount =50;
+	public int completearealevelamount =0;
+	public int completearealevelamountlimit =50;
 
 	public List <GameObject> jumplocs = new List<GameObject>();
 	public List <Transform> celllocations = new List<Transform>();
@@ -22,6 +23,8 @@ public class areamanager : MonoBehaviour {
 	private int cellspawnamount =0;
 	public int cellspawnamountlimit =5;
 	public int childcountint =0;
+
+	private bool areaclear = false;
 
 	void Awake()
 	{
@@ -73,7 +76,11 @@ public class areamanager : MonoBehaviour {
 
 	void Update()
 	{
-		
+
+		if(completearealevelamount>completearealevelamountlimit && areaclear)
+		{
+			areaclear = true;
+		}
 	}
 
 
