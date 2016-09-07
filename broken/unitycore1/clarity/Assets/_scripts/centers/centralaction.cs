@@ -28,6 +28,8 @@ public class centralaction : MonoBehaviour {
 	private GameObject outerarea;
 	private MeshRenderer meshren;
 
+	public float overridemovementspeed = 0;
+	public bool movetoparent = false;
 	public virtual void Awake()
 	{	
 		rbody = GetComponent<Rigidbody>();
@@ -141,6 +143,12 @@ public class centralaction : MonoBehaviour {
 		{
 			fullpower = true;
 			poweredup();
+		}
+
+		if(centralstate ==0 && movetoparent)
+		{
+			Vector3.MoveTowards(transform.position,transform.parent.position,overridemovementspeed * Time.deltaTime);
+			//print("moving to parent "+  );
 		}
 
 		if(playerinteraction.lookedatobj == transform.gameObject)

@@ -46,11 +46,7 @@ public class enemyaction : MonoBehaviour {
 		{
 			enemydeath();
 		}
-
-		if(col.transform.CompareTag("helperA"))
-		{print("it happened");
-			enemydeath();
-		}
+			
 	}
 
 	public virtual void enemydeath()
@@ -60,7 +56,7 @@ public class enemyaction : MonoBehaviour {
 		enemycontrolref.enemyactionref.Remove(GetComponent<enemyaction>());
 		Destroy(gameObject);
 	}
-
+		
 	public virtual void attackplayer()
 	{
 		attacktheplayertimer += Time.deltaTime;

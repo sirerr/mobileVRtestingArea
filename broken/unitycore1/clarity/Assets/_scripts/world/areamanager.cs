@@ -24,7 +24,7 @@ public class areamanager : MonoBehaviour {
 	public int cellspawnamountlimit =5;
 	public int childcountint =0;
 
-	private bool areaclear = false;
+	public bool areaclear = false;
 
 	void Awake()
 	{
@@ -72,14 +72,15 @@ public class areamanager : MonoBehaviour {
 
 	
 	}
-
+		
 
 	void Update()
 	{
 
-		if(completearealevelamount>completearealevelamountlimit && areaclear)
+		if(completearealevelamount>=completearealevelamountlimit && !areaclear)
 		{
 			areaclear = true;
+			enemycontrolref.destroyallenemies();
 		}
 	}
 

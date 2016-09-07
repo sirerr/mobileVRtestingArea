@@ -17,6 +17,8 @@ public class bulbaction : MonoBehaviour {
 
 	public int powermax =10;
 
+	public float overridemovementspeed = 0;
+	public bool movetoparent = false;
 	void Awake()
 	{
 
@@ -44,5 +46,13 @@ public class bulbaction : MonoBehaviour {
 
 	}
 
+	public void Update()
+	{
+		if(movetoparent)
+		{
+			Vector3.MoveTowards(transform.position,transform.parent.position,overridemovementspeed * Time.deltaTime);
+		}
+
+	}
 
 }

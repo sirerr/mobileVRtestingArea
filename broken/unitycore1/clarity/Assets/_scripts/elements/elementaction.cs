@@ -24,7 +24,8 @@ public class elementaction : MonoBehaviour {
 	public bool acklook = false;
 	public float vel = 5f;
 
-
+	public float overridemovementspeed = 0;
+	public bool movetoparent = false;
 	public virtual void Awake()
 	{
 		elementpower = Random.Range(0,elementhighlimit);
@@ -63,6 +64,11 @@ public class elementaction : MonoBehaviour {
 			acklook = false;
 		}
 	
+		if(!captured && movetoparent)
+		{
+			Vector3.MoveTowards(transform.position,transform.parent.position,overridemovementspeed * Time.deltaTime);
+			print("working");
+		}
 	}
 
 	public virtual void collected(Transform point)

@@ -7,7 +7,7 @@ public class areahelperaction : MonoBehaviour {
 
 	private bool attack = false;
 	public float waittimebeforeexpanding =4;
-	public float activetime = 20;
+	public float activetime = 30;
 	private Vector3 sizescale;
 	void OnEnable()
 

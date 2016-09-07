@@ -197,10 +197,12 @@ public class playerinteraction : MonoBehaviour {
 			{
 			case "cell":
 				holdappbuttontime +=Time.deltaTime;
-				print(holdappbuttontime);
+				//print(holdappbuttontime);
 				if(holdappbuttontime>holdappbuttontimelimit)
 				{
 					gatherobjects(hit);
+
+					print("don't hold app button anymore");
 				}
 				break;
 			}

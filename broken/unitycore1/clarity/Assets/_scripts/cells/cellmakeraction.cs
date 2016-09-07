@@ -8,24 +8,30 @@ public class cellmakeraction : MonoBehaviour {
 	public float gathertimerlimit =10;
 	private float gathercooldown =0;
 	public float gathercooldownlimit =10;
-	public List <GameObject> childobjs = new List<GameObject>();
 
-	public bool allgathered = false;
-	public bool startgather = true;
-	public bool readytogather = false;
-
+	public float gatherspeed = 3;
 	public void gatherchildren()
 	{
-		if(!allgathered)
-		{
 			for(int i =0;i<transform.childCount;i++)
 			{
+			switch(transform.GetChild(i).tag)
+			{
+			case "element":
+				transform.GetChild(i).GetComponent<elementaction>().movetoparent = true;
+				transform.GetChild(i).GetComponent<elementaction>().overridemovementspeed = gatherspeed;
+				break;
+			case "corecenter":
+				transform.GetChild(i).GetComponent<centralaction>().movetoparent = true;
+				transform.GetChild(i).GetComponent<centralaction>().overridemovementspeed = gatherspeed;
+				break;
 
-				childobjs.Add(transform.GetChild(i).gameObject);
+			case "bulb":
+				transform.GetChild(i).GetComponent<bulbaction>().movetoparent = true;
+				transform.GetChild(i).GetComponent<bulbaction>().overridemovementspeed = gatherspeed;
+				break;
 			}
-		}
-		allgathered = true;
-		startgather = true;
+			}
+ 
 		StartCoroutine(gatherchildrenup());
 
 	}
@@ -33,15 +39,29 @@ public class cellmakeraction : MonoBehaviour {
 	IEnumerator gatherchildrenup()
 	{
 		yield return new WaitForSeconds(gathertimerlimit);
-
-	}
-
-	void Update()
-	{
-		if(startgather)
+ 		
+		for(int i =0;i<transform.childCount;i++)
 		{
-			
+			switch(transform.GetChild(i).tag)
+			{
+			case "element":
+				transform.GetChild(i).GetComponent<elementaction>().movetoparent = false;
+			//	transform.GetChild(i).GetComponent<elementaction>().overridemovementspeed = gatherspeed;
+				break;
+			case "corecenter":
+				transform.GetChild(i).GetComponent<centralaction>().movetoparent = false;
+			//	transform.GetChild(i).GetComponent<centralaction>().overridemovementspeed = gatherspeed;
+				break;
+
+			case "bulb":
+				transform.GetChild(i).GetComponent<bulbaction>().movetoparent = false;
+			//	transform.GetChild(i).GetComponent<bulbaction>().overridemovementspeed = gatherspeed;
+				break;
+			}
 		}
+
 	}
+
+ 
 
 }
