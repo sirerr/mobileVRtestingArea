@@ -77,7 +77,7 @@ public class areaenemycontrol : MonoBehaviour {
 			{
 				called = true;
 				talktoenemies();
-				print(called);
+			//	print(called);
 			}
 
 			calltimer += Time.deltaTime;

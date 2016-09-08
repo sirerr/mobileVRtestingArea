@@ -26,6 +26,10 @@ public class elementaction : MonoBehaviour {
 
 	public float overridemovementspeed = 0;
 	public bool movetoparent = false;
+
+	public float minForce = -10;
+	public float maxForce =10;
+
 	public virtual void Awake()
 	{
 		elementpower = Random.Range(0,elementhighlimit);
@@ -34,9 +38,9 @@ public class elementaction : MonoBehaviour {
 		col = GetComponent<Collider>();
 
 		rbody.constraints = RigidbodyConstraints.None;
-		float ranx = Random.Range(-5,5);
-		float rany = Random.Range(-5,5);
-		float ranz = Random.Range(-5,5);
+		float ranx = Random.Range(minForce,maxForce);
+		float rany = Random.Range(minForce,maxForce);
+		float ranz = Random.Range(minForce,maxForce);
 		rbody.AddForce(ranx,rany,ranz);
 
 		meshren = GetComponent<MeshRenderer>();
@@ -67,7 +71,7 @@ public class elementaction : MonoBehaviour {
 		if(!captured && movetoparent)
 		{
 			Vector3.MoveTowards(transform.position,transform.parent.position,overridemovementspeed * Time.deltaTime);
-			print("working");
+			print("moving to parent");
 		}
 	}
 
@@ -109,6 +113,21 @@ public class elementaction : MonoBehaviour {
 		col.enabled = true;
 		meshren.enabled = true;
 		rbody.isKinematic = false;
+
+	}
+
+	public virtual void breakfromcentral()
+	{
+		col.enabled = true;
+		meshren.enabled = true;
+		rbody.isKinematic = true;
+		transform.parent =null;
+		captured =false;
+
+		float ranx = Random.Range(-5,5);
+		float rany = Random.Range(-5,5);
+		float ranz = Random.Range(-5,5);
+		rbody.AddForce(ranx,rany,ranz);
 
 	}
 }

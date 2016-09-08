@@ -11,9 +11,12 @@ public class bulbaction : MonoBehaviour {
 	// movement value
 	public float speed =2f;
 	//random firstmoves
-	public int ranx=0;
-	public int rany=0;
-	public int ranz=0;
+	private float ranx=0;
+	private float rany=0;
+	private float ranz=0;
+
+	public float minForce = -10;
+	public float maxForce =10;
 
 	public int powermax =10;
 
@@ -25,16 +28,16 @@ public class bulbaction : MonoBehaviour {
 		rbody =GetComponent<Rigidbody>();
 		col = GetComponent<Collider>();
 
-		ranx = Random.Range(-5,5);
-		rany = Random.Range(-5,5);
-		ranz = Random.Range(-5,5);
+		ranx = Random.Range(minForce,maxForce);
+		rany = Random.Range(minForce,maxForce);
+		ranz = Random.Range(minForce,maxForce);
 
 		rbody.AddForce(ranx,rany,ranz);
 
 		bulbpower = Random.Range(1,powermax);
 	}
 
-	public void absorbed()
+	public virtual void absorbed()
 	{
 		playerstats.playerposenergy += bulbpower;
 	//	print(playerstats.playerposenergy);
@@ -46,10 +49,11 @@ public class bulbaction : MonoBehaviour {
 
 	}
 
-	public void Update()
+	public virtual void Update()
 	{
 		if(movetoparent)
 		{
+			print("going to parent");
 			Vector3.MoveTowards(transform.position,transform.parent.position,overridemovementspeed * Time.deltaTime);
 		}
 

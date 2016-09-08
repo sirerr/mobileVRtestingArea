@@ -209,12 +209,33 @@ public class enemyAI : MonoBehaviour {
 				areacontrolref.importantobjs.Remove(importanttargets[0].gameObject);
 			}
 			importanttargets.Remove(importanttargets[0]);
-			print("already pure!");
+			print("already captured");
 		}
 	}
 
+
+	/// <summary>
+	/// changes the central objects states
+	/// </summary>
 	public void centerchange()
-	{}
+	{
+		centralaction cenref = importanttargets[0].GetComponent<centralaction>();
+
+		if(cenref.centralstate ==2)
+		{
+			cenref.breakapart();
+			TimePerImportantLocation = 0;
+			enemystate =4;
+		}else
+		{
+			enemystate =0;
+			if(areacontrolref.importantobjs.Find(obj=>obj.gameObject == importanttargets[0]) != null)
+			{
+				areacontrolref.importantobjs.Remove(importanttargets[0].gameObject);
+			}
+			importanttargets.Remove(importanttargets[0]);
+		}
+	}
 
 	public void movetopoolarea()
 	{

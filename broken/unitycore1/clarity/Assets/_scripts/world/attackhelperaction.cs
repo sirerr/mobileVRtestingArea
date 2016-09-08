@@ -22,7 +22,7 @@ public class attackhelperaction : MonoBehaviour {
 		if(chargecount == chargerequirement && activestate && readystate)
 		{
 			readystate = false;
-			print(readystate);
+		//	print(readystate);
 			areaattack();
 		}
 	}

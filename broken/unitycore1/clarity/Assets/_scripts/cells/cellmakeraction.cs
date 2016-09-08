@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class cellmakeraction : MonoBehaviour {
 
+	public bool allfinishedmaking = false;
+
 	private float gathertimer =0;
 	public float gathertimerlimit =10;
 	private float gathercooldown =0;
@@ -12,6 +14,7 @@ public class cellmakeraction : MonoBehaviour {
 	public float gatherspeed = 3;
 	public void gatherchildren()
 	{
+		print("gathering objects now");
 			for(int i =0;i<transform.childCount;i++)
 			{
 			switch(transform.GetChild(i).tag)

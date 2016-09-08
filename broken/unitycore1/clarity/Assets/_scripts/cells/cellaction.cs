@@ -42,8 +42,8 @@ public class cellaction : MonoBehaviour {
 	public areamanager areamanagerref;
 	public Transform floorpointer;
 
-
-
+	public GameObject celloptionobj;
+	public bool cellOptionOn = false;
 
 	public virtual	void Awake()
 	{
@@ -82,14 +82,14 @@ public class cellaction : MonoBehaviour {
 //			}
 			//very temporary
 			ele.transform.parent = makerobj.transform;
-			yield return new WaitForSeconds(.5f);
+			yield return new WaitForSeconds(.2f);
 		}
 
 		for(int i = 0; i<5;i++)
 		{
 			GameObject cen = Instantiate(centralobj,transform.position,transform.rotation) as GameObject; 
 			cen.transform.parent = makerobj.transform;
-			yield return new WaitForSeconds(.5f);
+			yield return new WaitForSeconds(.2f);
 		}
 
 		int count = Random.Range(1,10);
@@ -97,14 +97,18 @@ public class cellaction : MonoBehaviour {
 		{
 			GameObject bulb = Instantiate(bulbobj,transform.position,transform.rotation) as GameObject;
 			bulb.transform.parent = makerobj.transform;
-			yield return new WaitForSeconds(.5f);
+			yield return new WaitForSeconds(.2f);
 		}
-
+		makeractionref.allfinishedmaking = true;
 	}
 
 	public void talktomaker()
 	{
-		makeractionref.gatherchildren();
+		if(makeractionref.allfinishedmaking)
+		{
+			makeractionref.gatherchildren();
+			print("gathering children");
+		}
 	}
 
 	public virtual void finishedcell()
@@ -144,6 +148,14 @@ public class cellaction : MonoBehaviour {
 			rotatecell();
 		}
 			
+		if(cellOptionOn)
+		{
+			celloptionobj.SetActive(true);
+		}
+		else
+		{
+			celloptionobj.SetActive(false);
+		}
 	}
 
 	public virtual void getrotateready(Vector3 lookpoint)
@@ -167,13 +179,14 @@ public class cellaction : MonoBehaviour {
 
 	}
 
+
+
 	public virtual void leavecell()
 	{
 
 		gmanager.playerobj.transform.position = gmanager.lastjumplocation;
 		gmanager.playerobj.transform.rotation = gmanager.lastjumprotation;
-//		print(gmanager.lastjumplocation);
-//		print(gmanager.lastjumprotation);
+
 	}
 
 	public virtual Vector3 arriveincelllocation()

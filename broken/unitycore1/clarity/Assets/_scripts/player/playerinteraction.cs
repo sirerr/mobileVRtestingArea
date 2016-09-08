@@ -2,6 +2,7 @@
 using System.Collections;
 using Gvr.Internal;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class playerinteraction : MonoBehaviour {
 
@@ -16,7 +17,7 @@ public class playerinteraction : MonoBehaviour {
 	//acellerometer
 	private Vector3 controlleraccel;
 	//app button press
-	public bool appbuttonpress = false;
+	public bool appButtonPressDown = false;
 	// touchpad touch
 	public bool touchpaddown = false;
 	//click button
@@ -25,6 +26,15 @@ public class playerinteraction : MonoBehaviour {
 	public bool clickpressup = false;
 	//app button being pressed
 	public bool appbuttoncontinuedpress = false;
+	//click press down
+	public bool clickPressDown =false;
+	//touchpad holding it
+	public bool touchpadcontinuedpress = false;
+	//determines if the controller is connected or not
+	//private enum controllerStatus{controllerOn,controllerOff};
+
+	//player canvas
+	public Canvas playercanvas;
 
 	//recticle
 	public Transform rec;
@@ -78,16 +88,18 @@ public class playerinteraction : MonoBehaviour {
 
 	private int pmask = (1<< 8)| (1<<11) |(1<<9 | (1<<12));
 
-	//movement variables
-	private	float direction =0;
-	private float speed = 1f;
-
-	private bool firstjump = false;
+ 	private bool firstjump = false;
 	//determine if the button has been held down long enough to enable gatherer
 	private float holdappbuttontime =0;
 	public float holdappbuttontimelimit = 3;
+	//holding touchpad timer
+	private float touchingTouchPadtime=0;
+	public float touchingTouchPadTimeLimit = 2;
+
 	//will change when loading is down but always on for now
 	public bool areaready = true;
+	//testing the new input system, will turn it off or on
+	public bool newimputsystem =false;
 
 	void Awake()
 	{
@@ -105,20 +117,25 @@ public class playerinteraction : MonoBehaviour {
 	}
 
 
-	
+
 	// Update is called once per frame
 	void Update () {
 
+		//find out the connection status of the controller
+
+		//test code
+
 		//all controller input
 		controllerOR = GvrController.Orientation;
-		appbuttonpress = GvrController.AppButtonDown;
+		appButtonPressDown = GvrController.AppButtonDown;
 		touchpaddown = GvrController.TouchDown;
 		clickpress = GvrController.ClickButton;
+		clickPressDown = GvrController.ClickButtonDown;
 		clickpressup = GvrController.ClickButtonUp;
 		appbuttoncontinuedpress = GvrController.AppButton;
-
+		touchpadcontinuedpress = GvrController.IsTouching;
 		//old code isn't used
-		direction = touchpadxy.y * 10;
+ 
 	
 		//touchpad
 		touchpadxy = GvrController.TouchPos;
@@ -156,99 +173,163 @@ public class playerinteraction : MonoBehaviour {
 		}
 		//raycast
 
-		if(appbuttonpress && hit!=null)
+		if(newimputsystem)
 		{
-			switch (hit.tag)
+			if(clickPressDown && hit!=null)
 			{
-			case "element":
-				elementcollector(hit);
-				break;
-			
-			case "corecenter":
-				elementcenter(hit);
-				break;
-			case "cellholeloc":
-				cellholecenterlocaction(hit);
-				break;
-			case "bulb":
-				bulblookat(hit);
-				break;
-			case "jumppoint":
-				newlocationjump(hit);
-				break;
-			case "outsphere":
-				gotocell(hit);
-				break;
-			case "returner":
-				leavecell(hit);
-				break;
-			case "enemy":
-				positiveshot (hit);
-				break;
-			case "helperA":
-				positiveshot(hit);
-				break;
-			}
-		}
-
-		if(appbuttoncontinuedpress && hit!=null)
-		{
-			switch(hit.tag)
-			{
-			case "cell":
-				holdappbuttontime +=Time.deltaTime;
-				//print(holdappbuttontime);
-				if(holdappbuttontime>holdappbuttontimelimit)
+				switch (hit.tag)
 				{
-					gatherobjects(hit);
+				case "element":
+					currentrecmat = newrecmat;
+					elementcollector(hit);
+					break;
 
-					print("don't hold app button anymore");
+				case "corecenter":
+					currentrecmat = newrecmat;
+					elementcenter(hit);
+					break;
+				case "cellholeloc":
+					cellholecenterlocaction(hit);
+					break;
+				case "bulb":
+					currentrecmat = newrecmat;
+					bulblookat(hit);
+					break;
+				case "jumppoint":
+					newlocationjump(hit);
+					break;
+				case "outsphere":
+					gotocell(hit);
+					break;
+				case "returner":
+					leavecell(hit);
+					break;
+				case "enemy":
+					positiveshot (hit);
+					break;
+				case "helperA":
+					positiveshot(hit);
+					break;
 				}
-				break;
-			}
-		}
 
-		if(clickpress && hit!=null)
-		{
-			switch(hit.tag)
+			}
+
+			if(appButtonPressDown && hit!=null)
 			{
+				switch(hit.tag)
+				{
 				case "cell":
-			//	print("click happening");
-			//	print(rhit.point);
-				cellrotation(rhit.point,hit);
-				break;
+					celloptionaction(hit);
+					break;
+				}
+			}
+
+			if(touchpadcontinuedpress && hit!=null && !clickPressDown)
+			{
+				touchingTouchPadtime +=Time.deltaTime;
+				if(touchingTouchPadtime>touchingTouchPadTimeLimit)
+				{
+					switch(hit.tag)
+					{
+					case "element":
+						elementcleansing(hit);
+						break;
+					case "corecenter":
+						touchpadactioncenterobj();
+						break;
+					}
+				}
 			}
 		}
-
-		if (clickpressup && hit!=null)
+		else
 		{
-			switch(hit.tag)
+			if(appButtonPressDown && hit!=null)
 			{
+				switch (hit.tag)
+				{
+				case "element":
+					elementcollector(hit);
+					break;
+
+				case "corecenter":
+					elementcenter(hit);
+					break;
+				case "cellholeloc":
+					cellholecenterlocaction(hit);
+					break;
+				case "bulb":
+					bulblookat(hit);
+					break;
+				case "jumppoint":
+					newlocationjump(hit);
+					break;
+				case "outsphere":
+					gotocell(hit);
+					break;
+				case "returner":
+					leavecell(hit);
+					break;
+				case "enemy":
+					positiveshot (hit);
+					break;
+				case "helperA":
+					positiveshot(hit);
+					break;
+				}
+			}
+
+			if(clickpress && hit!=null)
+			{
+				switch(hit.tag)
+				{
 				case "cell":
-				resetcellrotation(hit);
-				break;
+					cellrotation(rhit.point,hit);
+					break;
+				}
 			}
-		}
 
-		if(touchpaddown && hit!=null)
-		{
-
-			switch(hit.tag)
+			if (clickpressup && hit!=null)
 			{
-			case "element":
-				elementcleansing(hit);
-				break;
-			case "corecenter":
-				touchpadactioncenterobj();
-				break;
-			case "bulb":
-				//cleansingbulb(hit);
-				break;
+				switch(hit.tag)
+				{
+				case "cell":
+					resetcellrotation(hit);
+					break;
+				}
 			}
 
+			if(touchpaddown && hit!=null)
+			{
+
+				switch(hit.tag)
+				{
+				case "element":
+					elementcleansing(hit);
+					break;
+				case "corecenter":
+					touchpadactioncenterobj();
+					break;
+				}
+
+			}
+
+
 		}
+			
+	}
 
+	public void celloptionaction(Transform hit)
+	{
+		cellaction cellref = hit.GetComponent<cellaction>();
 
+		if(!cellref.cellOptionOn)
+		{
+			cellref.cellOptionOn = true;
+		}
+		else
+		{
+			cellref.cellOptionOn = false;
+		}
 	}
 
 	public void gatherobjects(Transform cellhit)
@@ -260,7 +341,7 @@ public class playerinteraction : MonoBehaviour {
 	public void leavecell(Transform returner)
 	{
 		playerstate =0;
-		returner.parent.transform.GetComponent<cellaction>().leavecell();
+		returner.GetComponentInParent<celloptionbuttonaction>().cellactionref.leavecell();
 	}
 
 	public void gotocell(Transform cellobj)
@@ -277,6 +358,8 @@ public class playerinteraction : MonoBehaviour {
 		gmanager.playerobj.transform.rotation = cellobj.parent.transform.GetComponent<cellaction>().arriveincellrotation();
 	}
 
+
+
 	public void resetcellrotation(Transform hitobj)
 	{
 		hitobj.GetComponent<cellaction>().dorotate = false;
@@ -290,6 +373,8 @@ public class playerinteraction : MonoBehaviour {
 		celltrans.GetComponent<cellaction>().dorotate = true;
 	}
 
+
+
 	public void elementcleansing(Transform elementobj)
 	{
 
@@ -298,6 +383,7 @@ public class playerinteraction : MonoBehaviour {
 			hit.GetComponent<elementaction>().cleanelement();
 			playerstats.playerposenergy--;
 		}
+		touchingTouchPadtime =0;
 	}
 
 	public void newlocationjump(Transform jumpobj)
@@ -321,8 +407,6 @@ public class playerinteraction : MonoBehaviour {
 		}
 	}
 
-
-
 	public void bulblookat(Transform obj)
 	{
 
@@ -334,7 +418,7 @@ public class playerinteraction : MonoBehaviour {
 		if(centercollected!=null)
 		{
 			centercollected.GetComponent<centralaction>().tohole(obj);
-			centercollected.transform.parent = obj;
+			//centercollected.transform.parent = obj;
 			centercollected = null;
 		}
 	}
@@ -342,6 +426,7 @@ public class playerinteraction : MonoBehaviour {
 	public void touchpadactioncenterobj()
 	{
 		hit.GetComponent<centralaction>().centralstateaction();
+		touchingTouchPadtime =0;
 	}
 
 
@@ -360,9 +445,6 @@ public class playerinteraction : MonoBehaviour {
 			elementcolection.Add(obj.gameObject);
 			elementintcount++;
 		}
-
-
-
 	}
 		
 

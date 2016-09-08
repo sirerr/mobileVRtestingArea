@@ -14,7 +14,7 @@ public class enemyaction : MonoBehaviour {
 
 	//timer for being attacked
 	private float beingattackedtimer = 0;
-	public float beingattackedtimerlimit =30;
+	public float beingattackedtimerlimit =5;
 	//object for attacking player
 	private float attacktheplayertimer =0;
 	public float attacktheplayertimerlimit =2;
@@ -119,9 +119,12 @@ public class enemyaction : MonoBehaviour {
 			break;
 		case "corecenter":
 		//	print("saw corecenter");
+			centralaction cenref = col.GetComponent<centralaction>();
 			if(col.GetComponent<centralaction>().fullpower)
 			{
-			
+				print("found a center");
+				enemycontrolref.newfind =true;
+				enemycontrolref.importantobjs.Add(cenref.gameObject);
 
 				//	airef.importanttargets.Add(col.transform);
 			}

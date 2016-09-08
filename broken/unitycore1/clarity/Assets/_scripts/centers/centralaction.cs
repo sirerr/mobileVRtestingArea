@@ -21,7 +21,7 @@ public class centralaction : MonoBehaviour {
 	//is it being raycasted to
 	public bool acklook = false;
 	//speed to hole
-	public float vel = 8f;
+	public float vel = 20f;
 	// is it set in a hole
 	private bool setinhole = false;
 	//the first child object the outer area
@@ -30,15 +30,20 @@ public class centralaction : MonoBehaviour {
 
 	public float overridemovementspeed = 0;
 	public bool movetoparent = false;
+
+	public float minForce = -10;
+	public float maxForce =10;
+
 	public virtual void Awake()
 	{	
 		rbody = GetComponent<Rigidbody>();
 		col = GetComponent<Collider>();
 		meshren = GetComponent<MeshRenderer>();
 		rbody.constraints = RigidbodyConstraints.None;
-		float ranx = Random.Range(-5,5);
-		float rany = Random.Range(-5,5);
-		float ranz = Random.Range(-5,5);
+
+		float ranx = Random.Range(minForce,maxForce);
+		float rany = Random.Range(minForce,maxForce);
+		float ranz = Random.Range(minForce,maxForce);
 		rbody.AddForce(ranx,rany,ranz);
 		outerarea = transform.GetChild(0).gameObject;
 		outerarea.SetActive(false);
@@ -48,6 +53,7 @@ public class centralaction : MonoBehaviour {
 	{
 		rbody.constraints = RigidbodyConstraints.None;
 		setinhole = true;
+		col.enabled = true;
 		Vector3 dir = (holepoint.position - transform.position) *vel;
 		rbody.velocity = dir;
 		meshren.enabled = true;
@@ -57,7 +63,7 @@ public class centralaction : MonoBehaviour {
 		{
 			transform.GetChild(i).gameObject.SetActive(true);
 		}
-
+		transform.parent = holepoint;
 	}
 
 
@@ -66,7 +72,12 @@ public class centralaction : MonoBehaviour {
 		if(centralstate == 0)
 		{
 			becomeactive();
-		}else if(centralstate ==1 && !fullpower)
+		}
+
+		///maybe change this
+	
+		// possible change in how this works coming maybe
+		else if(centralstate ==1 && !fullpower)
 		{
 				rbody.constraints = RigidbodyConstraints.None;
 			float ranx = Random.Range(-5,5);
@@ -100,6 +111,8 @@ public class centralaction : MonoBehaviour {
 
 		if(!setinhole && fullpower)
 		{
+			//this state shows the object has been grabbed
+			centralstate =3;
 			rbody.constraints = RigidbodyConstraints.FreezeAll;
 			rbody.isKinematic = true;
 			transform.position = centercollect.position;
@@ -148,7 +161,7 @@ public class centralaction : MonoBehaviour {
 		if(centralstate ==0 && movetoparent)
 		{
 			Vector3.MoveTowards(transform.position,transform.parent.position,overridemovementspeed * Time.deltaTime);
-			//print("moving to parent "+  );
+			print("moving to parent ");
 		}
 
 		if(playerinteraction.lookedatobj == transform.gameObject)
@@ -175,6 +188,24 @@ public class centralaction : MonoBehaviour {
 				col.collider.enabled = false;
 			}
 		}
+
+	}
+
+	public virtual void breakapart()
+	{
+		rbody.constraints = RigidbodyConstraints.None;
+		float ranx = Random.Range(-5,5);
+		float rany = Random.Range(-5,5);
+		float ranz = Random.Range(-5,5);
+		rbody.AddForce(ranx,rany,ranz);
+		int childs = transform.childCount;
+		for(int i=0;i<childs;i++)
+		{ 
+			elementaction ele = transform.GetChild(0).GetComponent<elementaction>();
+			transform.GetChild(i).gameObject.SetActive(true);
+			ele.breakfromcentral();
+		}
+		centralstate =0;
 
 	}
 

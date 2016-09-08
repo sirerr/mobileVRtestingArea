@@ -41,7 +41,7 @@ public class areamanager : MonoBehaviour {
 
 			if(transform.GetChild(i).CompareTag("cellspawn"))
 			{
-				print("working");
+				//print("working");
 				celllocations.Add(transform.GetChild(i));
 				Transform celllister = celllocations[celllocations.Count-1];
 				int chooseint = Random.Range(-1,2);
