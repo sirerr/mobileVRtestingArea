@@ -26,10 +26,23 @@ public class areamanager : MonoBehaviour {
 
 	public bool areaclear = false;
 
+	public GameObject helperobj;
+	public Transform helperlocation;
+
 	void Awake()
 	{
 		enemycontrolref = GetComponent<areaenemycontrol>();
 		gmanager.currentarea = transform.gameObject;
+
+		//create help object, used in testing help object
+		GameObject help = Instantiate(helperobj,helperlocation.position,Quaternion.identity) as GameObject;
+		help.GetComponent<attackhelperaction>().areamanagerref = GetComponent<areamanager>();
+		help.GetComponent<attackhelperaction>().areaenemyref =GetComponent<areaenemycontrol>();
+		help.GetComponent<attackhelperaction>().enabled = true;
+		//help.GetComponent<attackhelperaction>().startpos.position = helperlocation.position;
+
+
+		//creating jumps and spawns
 		childcountint = transform.childCount;
 		for(int i =0; i<childcountint;i++)
 		{

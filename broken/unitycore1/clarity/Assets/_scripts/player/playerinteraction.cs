@@ -86,7 +86,7 @@ public class playerinteraction : MonoBehaviour {
 	//the positive energy blast object
 	public GameObject posblastobj;
 
-	private int pmask = (1<< 8)| (1<<11) |(1<<9 | (1<<12));
+	private int pmask = (1<< 8)| (1<<11) |(1<<9 | (1<<12)| (1<<13));
 
  	private bool firstjump = false;
 	//determine if the button has been held down long enough to enable gatherer
