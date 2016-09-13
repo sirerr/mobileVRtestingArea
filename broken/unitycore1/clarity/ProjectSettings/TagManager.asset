@@ -25,6 +25,7 @@ TagManager:
   - eattack
   - cellspawn
   - gatherer
+  - UIexit
   layers:
   - Default
   - TransparentFX

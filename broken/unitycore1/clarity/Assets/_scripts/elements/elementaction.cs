@@ -70,8 +70,9 @@ public class elementaction : MonoBehaviour {
 	
 		if(!captured && movetoparent)
 		{
-			Vector3.MoveTowards(transform.position,transform.parent.position,overridemovementspeed * Time.deltaTime);
-			print("moving to parent");
+			Vector3 dir = (transform.parent.position - transform.position) *overridemovementspeed;
+			rbody.AddForce(dir);
+			//move to parent object
 		}
 	}
 
@@ -129,5 +130,17 @@ public class elementaction : MonoBehaviour {
 		float ranz = Random.Range(-5,5);
 		rbody.AddForce(ranx,rany,ranz);
 
+	}
+	public virtual void stopmovement()
+	{
+		rbody.velocity = Vector3.zero;
+
+	}
+	public virtual void startmovement()
+	{
+		float ranx = Random.Range(-5,5);
+		float rany = Random.Range(-5,5);
+		float ranz = Random.Range(-5,5);
+		rbody.AddForce(ranx,rany,ranz);
 	}
 }

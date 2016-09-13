@@ -53,10 +53,23 @@ public class bulbaction : MonoBehaviour {
 	{
 		if(movetoparent)
 		{
-			print("going to parent");
-			Vector3.MoveTowards(transform.position,transform.parent.position,overridemovementspeed * Time.deltaTime);
+			Vector3 dir = (transform.parent.position - transform.position) *overridemovementspeed;
+			rbody.AddForce(dir);
 		}
 
+	}
+	public virtual void stopmovement()
+	{
+		rbody.velocity = Vector3.zero;
+
+	}
+
+	public virtual void startmovemnt()
+	{
+		float ranx = Random.Range(-5,5);
+		float rany = Random.Range(-5,5);
+		float ranz = Random.Range(-5,5);
+		rbody.AddForce(ranx,rany,ranz);
 	}
 
 }

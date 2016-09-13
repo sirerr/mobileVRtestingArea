@@ -210,6 +210,15 @@ public class playerinteraction : MonoBehaviour {
 				case "helperA":
 					positiveshot(hit);
 					break;
+				case "gatherer":
+					startGatheringObjs(hit);
+					break;
+				case "rotator":
+					startRotateCell(hit);
+					break;
+				case "UIexit":
+					stopRotateCell(hit);
+					break;
 				}
 
 			}
@@ -275,6 +284,16 @@ public class playerinteraction : MonoBehaviour {
 				case "helperA":
 					positiveshot(hit);
 					break;
+				case "gatherer":
+					
+					break;
+				case "rotator":
+					
+					break;
+				case "UIexit":
+
+					break;
+					
 				}
 			}
 
@@ -318,6 +337,21 @@ public class playerinteraction : MonoBehaviour {
 			
 	}
 
+	public void startRotateCell(Transform rotateEnter)
+	{
+		rotateEnter.GetComponentInParent<celloptionbuttonaction>().enterRotate();
+	}
+
+	public void stopRotateCell(Transform rotateExit)
+	{
+		rotateExit.GetComponentInParent<celloptionbuttonaction>().exitRotate();
+	}
+
+	public void startGatheringObjs(Transform gatherStart)
+	{
+		gatherStart.GetComponentInParent<celloptionbuttonaction>().startGather();
+	}
+
 	public void celloptionaction(Transform hit)
 	{
 		cellaction cellref = hit.GetComponent<cellaction>();
@@ -342,6 +376,7 @@ public class playerinteraction : MonoBehaviour {
 	{
 		playerstate =0;
 		returner.GetComponentInParent<celloptionbuttonaction>().cellactionref.leavecell();
+		returner.GetComponentInParent<celloptionbuttonaction>().disableobj();
 	}
 
 	public void gotocell(Transform cellobj)
