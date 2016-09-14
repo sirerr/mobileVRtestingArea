@@ -245,7 +245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 670f36e2b85855d46a7f7d4405f21772, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ehealth: 10
+  ehealth: 5
   enemypower: 0
   currentarea: {fileID: 0}
 --- !u!135 &135000012203405780

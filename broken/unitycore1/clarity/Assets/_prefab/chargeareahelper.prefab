@@ -131,14 +131,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b4655698a9dea84ca945afe9befa850, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startpos: {fileID: 0}
-  chargerequirement: 10
+  startpos: {x: 0, y: 0, z: 0}
+  chargerequirement: 5
   chargecount: 0
   usagelimit: 3
   helperstate: 0
   currenttarget: {fileID: 0}
-  speed: 3
-  safedistance: 0.5
+  speed: 15
+  safedistance: 2
   areaenemyref: {fileID: 0}
   areamanagerref: {fileID: 0}
   donewithdestroy: 0

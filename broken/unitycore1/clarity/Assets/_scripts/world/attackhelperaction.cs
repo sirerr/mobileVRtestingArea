@@ -3,19 +3,21 @@ using System.Collections;
 
 public class attackhelperaction : MonoBehaviour {
 	//start position
-	public Transform startpos;
-	//amount of times you have to hit it with energy before activating
+	private Vector3 startpos;
+	//start rotation
+	private Quaternion startrot;
+	//amount of times you must hit it in order to activate the object
 	public int chargerequirement = 4;
 	//keep the charge count
 	public int chargecount =0;
 	//amount of times used by player
 	public int usagelimit = 3;
 	//keeps count of the amount of times the helper is used
-	private int usage = 0;
+	public int usage = 0;
 	//tells the state of the helper
-	public int helperstate =0;
+	private int helperstate =0;
 	//helpers current target
-	public GameObject currenttarget;
+	private GameObject currenttarget;
 
 	public float speed =3;
 	public float safedistance =.5f;
@@ -27,7 +29,8 @@ public class attackhelperaction : MonoBehaviour {
 
 	void OnEnable()
 	{
-		startpos.position = transform.position;
+		startpos = transform.position;
+		startrot = transform.rotation;
 	}
 
 	public void OnCollisionEnter(Collision col)
@@ -52,9 +55,9 @@ public class attackhelperaction : MonoBehaviour {
 
 	public void findandsearch()
 	{
-
+		print("finding and searching");
 		transform.LookAt(currenttarget.transform);
-		Vector3.MoveTowards(transform.position,currenttarget.transform.position,speed *Time.deltaTime);
+		transform.position = Vector3.MoveTowards(transform.position,currenttarget.transform.position,speed *Time.deltaTime);
 		if(Vector3.Distance(transform.position,currenttarget.transform.position)<safedistance)
 		{
 			destroyenemy();
@@ -70,6 +73,8 @@ public class attackhelperaction : MonoBehaviour {
 	{
 		helperstate =2;
 		// destroy enemy
+		areaenemyref.enemylist.RemoveAt(0);
+		areaenemyref.enemyactionref.RemoveAt(0);
 		Destroy(currenttarget);
 		currenttarget =null;
 
@@ -77,7 +82,7 @@ public class attackhelperaction : MonoBehaviour {
 
 	IEnumerator gobacktoready()
 	{
-		yield return new WaitForSeconds (10f);
+		yield return new WaitForSeconds (2f);
 		print("reset to accept again");
 		chargecount =0;
 		usage++;
@@ -85,10 +90,13 @@ public class attackhelperaction : MonoBehaviour {
 		if(usage == usagelimit)
 		{
 			helperstate =5;
+			transform.rotation = startrot;
+			transform.position  = startpos;
 		}
 		else
 		{
-			transform.position  = startpos.position;
+			transform.rotation = startrot;
+			transform.position  = startpos;
 			helperstate =0;
 		}
 
