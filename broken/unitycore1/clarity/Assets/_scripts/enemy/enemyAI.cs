@@ -7,6 +7,7 @@ public class enemyAI : MonoBehaviour {
 	private bool raycastobj = false;
 	public enemystats statsref;
 	public areaenemycontrol areacontrolref;
+	public enemyaction enemyactionref;
 	public  List <Transform> pooltargets = new List<Transform>();
 	public List <Transform> importanttargets = new List<Transform>();
 	//
@@ -36,6 +37,7 @@ public class enemyAI : MonoBehaviour {
 
 	void OnEnable()
 	{
+		enemyactionref = GetComponent<enemyaction>();
 		statsref = GetComponent<enemystats>();
 		poolsafedistance = Random.Range(5,20);
 	//	print(poolsafedistance);
@@ -78,30 +80,29 @@ public class enemyAI : MonoBehaviour {
 			//action on important object
 			break;
 		case 3:
+
+			if(!busy)
+			{
+				enemystate =5;
+			}
+			beingattacked();
 			//player point
 			//move to player point
 			break;
 		case 4:
 		//	print("back to 0");
-			TimePerImportantLocation+= Time.deltaTime;
-			transform.LookAt(importanttargets[0].position);
-			//will wait for a few seconds then make the enemy go somewhere else
-			if(TimePerImportantLocation>TimeLimitPerImportantLocation)
-			{
-				if(areaenemycontrol.importantobjs.Find(obj=>obj.gameObject == importanttargets[0]) != null)
-				{
-					areaenemycontrol.importantobjs.Remove(importanttargets[0].gameObject);
-				}
-				importanttargets.Remove(importanttargets[0]);
-				print("taken care of");
-				enemystate = 0;
-			}
+			waitingatimportantobject();
 			break;
 		case 5:
 			if(!busy)
 			{
 				enemystate =0;
 			}
+			else
+			{
+				enemystate = 3;
+			}
+
 			break;
 		case 10:
 
@@ -114,6 +115,44 @@ public class enemyAI : MonoBehaviour {
 		}
 	}
 
+
+	public void beingattacked()
+	{
+		
+
+		float playerdistance = Vector3.Distance(transform.position,gmanager.playerobj.transform.position);
+		transform.LookAt(gmanager.playerobj.transform.position);
+		if(playerdistance>playersafedistance)
+		{
+			transform.position = Vector3.MoveTowards(transform.position,gmanager.playerobj.transform.position,movespeed *Time.deltaTime);
+
+			//enemystate = 3;
+		}
+		else
+		{
+			enemyactionref.attackplayer();
+		}
+
+	}
+
+	public void waitingatimportantobject()
+
+	{
+		TimePerImportantLocation+= Time.deltaTime;
+		transform.LookAt(importanttargets[0].position);
+		//will wait for a few seconds then make the enemy go somewhere else
+		if(TimePerImportantLocation>TimeLimitPerImportantLocation)
+		{
+			if(areacontrolref.importantobjs.Find(obj=>obj.gameObject == importanttargets[0]) != null)
+			{
+				areacontrolref.importantobjs.Remove(importanttargets[0].gameObject);
+			}
+			importanttargets.Remove(importanttargets[0]);
+			print("taken care of");
+			enemystate = 0;
+		}
+
+	}
 
 	public void enemybyobject()
 	{
@@ -165,28 +204,50 @@ public class enemyAI : MonoBehaviour {
 		}else
 		{
 			enemystate =0;
-			if(areaenemycontrol.importantobjs.Find(obj=>obj.gameObject == importanttargets[0]) != null)
+			if(areacontrolref.importantobjs.Find(obj=>obj.gameObject == importanttargets[0]) != null)
 			{
-				areaenemycontrol.importantobjs.Remove(importanttargets[0].gameObject);
+				areacontrolref.importantobjs.Remove(importanttargets[0].gameObject);
 			}
 			importanttargets.Remove(importanttargets[0]);
-			print("already pure!");
+			print("already captured");
 		}
 	}
 
+
+	/// <summary>
+	/// changes the central objects states
+	/// </summary>
 	public void centerchange()
-	{}
+	{
+		centralaction cenref = importanttargets[0].GetComponent<centralaction>();
+
+		if(cenref.centralstate ==2)
+		{
+			cenref.breakapart();
+			TimePerImportantLocation = 0;
+			enemystate =4;
+		}else
+		{
+			enemystate =0;
+			if(areacontrolref.importantobjs.Find(obj=>obj.gameObject == importanttargets[0]) != null)
+			{
+				areacontrolref.importantobjs.Remove(importanttargets[0].gameObject);
+			}
+			importanttargets.Remove(importanttargets[0]);
+		}
+	}
 
 	public void movetopoolarea()
 	{
 		float distance = Vector3.Distance(transform.position,pooltargets[poolint].position);
-
-		if(distance>poolsafedistance)
+		bool isthere = false;
+		if(distance>poolsafedistance && !isthere)
 		{
 			transform.LookAt(pooltargets[poolint].position);
 			transform.position = Vector3.MoveTowards(transform.position,pooltargets[poolint].position,movespeed *Time.deltaTime);
 		}else
 		{
+			isthere = true;
 			TimePerPoolLocation +=Time.deltaTime;
 		//	transform.rotation =startrotation;
 			if(TimePerPoolLocation>TimeLimitPerPoolLocation)
@@ -201,7 +262,7 @@ public class enemyAI : MonoBehaviour {
 					int temppoolint  = Random.Range(0,pooltargets.Count-1);
 					poolint = temppoolint;
 				}
-
+				isthere = false;
 			}
 		}
 	}

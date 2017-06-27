@@ -3,10 +3,6 @@ using System.Collections;
 
 public class elementtest0 : elementaction {
 
-	public override void OnEnable ()
-	{
-		base.OnEnable ();
-	}
 
 	public override void Awake ()
 	{

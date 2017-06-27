@@ -12,6 +12,15 @@ public class enemyaction : MonoBehaviour {
 	public areaenemycontrol enemycontrolref;
 	public  GameObject childcol;
 
+	//timer for being attacked
+	private float beingattackedtimer = 0;
+	public float beingattackedtimerlimit =5;
+	//object for attacking player
+	private float attacktheplayertimer =0;
+	public float attacktheplayertimerlimit =2;
+	public GameObject attack0obj;
+
+
 	public bool makechildactive = false;
 
 	//safe
@@ -28,6 +37,7 @@ public class enemyaction : MonoBehaviour {
 	{
 		if(col.gameObject.CompareTag("pattack"))
 		{
+			beingattackedtimer =0;
 			statsref.ehealth--;
 			airef.busy = true;
 		}
@@ -36,6 +46,7 @@ public class enemyaction : MonoBehaviour {
 		{
 			enemydeath();
 		}
+			
 	}
 
 	public virtual void enemydeath()
@@ -45,9 +56,29 @@ public class enemyaction : MonoBehaviour {
 		enemycontrolref.enemyactionref.Remove(GetComponent<enemyaction>());
 		Destroy(gameObject);
 	}
+		
+	public virtual void attackplayer()
+	{
+		attacktheplayertimer += Time.deltaTime;
+
+		if(attacktheplayertimer>attacktheplayertimerlimit)
+		{
+			GameObject attack = Instantiate(attack0obj,airef.enemyfront.position,airef.enemyfront.rotation) as GameObject;
+			attacktheplayertimer = 0;
+		}
+
+	}
 
 	protected void Update()
 	{
+
+		beingattackedtimer += Time.deltaTime;
+
+		if(beingattackedtimer>beingattackedtimerlimit && airef.busy)
+		{
+			airef.busy = false;
+			beingattackedtimer = 0;
+		}
 
 		if(makechildactive)
 		{
@@ -81,16 +112,19 @@ public class enemyaction : MonoBehaviour {
 			{
 				print ("found one!!!");
 				enemycontrolref.newfind = true;
-				areaenemycontrol.importantobjs.Add(eleref.gameObject);
+				enemycontrolref.importantobjs.Add(eleref.gameObject);
 				//	airef.importanttargets.Add(col.transform);
 			}
 
 			break;
 		case "corecenter":
 		//	print("saw corecenter");
+			centralaction cenref = col.GetComponent<centralaction>();
 			if(col.GetComponent<centralaction>().fullpower)
 			{
-			
+				print("found a center");
+				enemycontrolref.newfind =true;
+				enemycontrolref.importantobjs.Add(cenref.gameObject);
 
 				//	airef.importanttargets.Add(col.transform);
 			}

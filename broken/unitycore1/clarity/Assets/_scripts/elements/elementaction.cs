@@ -24,10 +24,25 @@ public class elementaction : MonoBehaviour {
 	public bool acklook = false;
 	public float vel = 5f;
 
-	public virtual	void OnEnable()
+	public float overridemovementspeed = 0;
+	public bool movetoparent = false;
+
+	public float minForce = -10;
+	public float maxForce =10;
+
+	public virtual void Awake()
 	{
-		col = GetComponent<Collider>();
+		elementpower = Random.Range(0,elementhighlimit);
+
 		rbody = GetComponent<Rigidbody>();
+		col = GetComponent<Collider>();
+
+		rbody.constraints = RigidbodyConstraints.None;
+		float ranx = Random.Range(minForce,maxForce);
+		float rany = Random.Range(minForce,maxForce);
+		float ranz = Random.Range(minForce,maxForce);
+		rbody.AddForce(ranx,rany,ranz);
+
 		meshren = GetComponent<MeshRenderer>();
 
 		if(!purestate)
@@ -38,20 +53,6 @@ public class elementaction : MonoBehaviour {
 		{
 			meshren.material = puremat;
 		}
-	}
-
-	public virtual void Awake()
-	{
-		elementpower = Random.Range(0,elementhighlimit);
-
-		rbody = GetComponent<Rigidbody>();
-		col = GetComponent<Collider>();
-
-		rbody.constraints = RigidbodyConstraints.None;
-		float ranx = Random.Range(-5,5);
-		float rany = Random.Range(-5,5);
-		float ranz = Random.Range(-5,5);
-		rbody.AddForce(ranx,rany,ranz);
 	}
 
  
@@ -67,12 +68,17 @@ public class elementaction : MonoBehaviour {
 			acklook = false;
 		}
 	
+		if(!captured && movetoparent)
+		{
+			Vector3 dir = (transform.parent.position - transform.position) *overridemovementspeed;
+			rbody.AddForce(dir);
+			//move to parent object
+		}
 	}
 
 	public virtual void collected(Transform point)
 	{
-		if(purestate)
-		{
+
 			transform.position = point.position;
 
 			col.enabled = false;
@@ -81,7 +87,6 @@ public class elementaction : MonoBehaviour {
 			transform.parent =null;
 			transform.parent = point;
 			captured =true;
-		}
 
 	}
 
@@ -110,5 +115,32 @@ public class elementaction : MonoBehaviour {
 		meshren.enabled = true;
 		rbody.isKinematic = false;
 
+	}
+
+	public virtual void breakfromcentral()
+	{
+		col.enabled = true;
+		meshren.enabled = true;
+		rbody.isKinematic = true;
+		transform.parent =null;
+		captured =false;
+
+		float ranx = Random.Range(-5,5);
+		float rany = Random.Range(-5,5);
+		float ranz = Random.Range(-5,5);
+		rbody.AddForce(ranx,rany,ranz);
+
+	}
+	public virtual void stopmovement()
+	{
+		rbody.velocity = Vector3.zero;
+
+	}
+	public virtual void startmovement()
+	{
+		float ranx = Random.Range(-5,5);
+		float rany = Random.Range(-5,5);
+		float ranz = Random.Range(-5,5);
+		rbody.AddForce(ranx,rany,ranz);
 	}
 }

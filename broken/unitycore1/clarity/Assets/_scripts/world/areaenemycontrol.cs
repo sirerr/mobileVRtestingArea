@@ -23,8 +23,13 @@ public class areaenemycontrol : MonoBehaviour {
 	public GameObject enemyobj;
 
 	//important locations
-	public static List<GameObject> importantobjs = new List<GameObject>();
-	public static int importantobjcount = 0;
+	/// <summary>
+	/// these used to be static locations
+	/// </summary>
+	public  List<GameObject> importantobjs = new List<GameObject>();
+	public  int importantobjcount = 0;
+
+
 	public bool newfind = false;
 	public int enemycallamount = 5;
 	private float calltimer = 0;
@@ -39,18 +44,40 @@ public class areaenemycontrol : MonoBehaviour {
 	public delegate void foundobj(Transform obj);
 	public static event foundobj foundimportantobj;
 
+	// area ref
+	private areamanager areamanref;
+
+	//to destroy all enemies in the scene
+
+	public void destroyallenemies()
+	{
+		StartCoroutine(destroyovertime());
+	}
+
+	IEnumerator destroyovertime()
+	{
+		float waittime=0;
+		int enemycount = enemylist.Count;
+		for(int i =0;i<enemycount;i++)
+		{
+			waittime = Random.Range(.1f,2);
+			yield return new WaitForSeconds(waittime);
+			enemyactionref[0].enemydeath();
+		}
+	}
+
 	// Update is called once per frame
 	public void Update () {
 
 		importantobjcount = importantobjs.Count -1;
 
-		if(readytocall)
+		if(readytocall && !areamanref.areaclear)
 		{
 			if(!called)
 			{
 				called = true;
 				talktoenemies();
-				print(called);
+			//	print(called);
 			}
 
 			calltimer += Time.deltaTime;
@@ -119,7 +146,7 @@ public class areaenemycontrol : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
-
+		areamanref = GetComponent<areamanager>();
 		for(int i=1;i<=poolareacount;i++)
 		{
 			Vector3 vec3;

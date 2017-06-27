@@ -3,7 +3,7 @@ using System.Collections;
 
 public class playerattackaction : MonoBehaviour {
 
-	public float speed =5;
+	public float speed =10;
 	Rigidbody rbody;
 
 

@@ -12,7 +12,7 @@ public class holelocaction : MonoBehaviour {
 
 	public virtual void OnCollisionEnter(Collision col)
 	{
-		if(col.transform.CompareTag("corecenter") && col.transform.GetComponent<centralaction>().centralstate ==2)
+		if(col.transform.CompareTag("corecenter") && col.transform.GetComponent<centralaction>().centralstate ==3)
 		{
 			col.rigidbody.isKinematic = true;
 			col.transform.position = transform.position;

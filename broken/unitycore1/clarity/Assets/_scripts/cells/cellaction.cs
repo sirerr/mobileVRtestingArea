@@ -38,6 +38,16 @@ public class cellaction : MonoBehaviour {
 	private Color finishedcellskin;
 
 	private GameObject makerobj;
+	public cellmakeraction makeractionref;
+	public areamanager areamanagerref;
+	public Transform floorpointer;
+
+	public GameObject celloptionobj;
+	public bool cellOptionOn = false;
+
+	public bool swipeRotationOn = false;
+	public float swipevalue=0;
+	public int swipedirection=0;
 
 	public virtual	void Awake()
 	{
@@ -47,36 +57,40 @@ public class cellaction : MonoBehaviour {
 
 		defaultrotation = transform.rotation.eulerAngles;
 		returnobjlocation = returnobj.transform.position;
+
+		requiredpower = Random.Range(10,13);
 	}
 
 	public virtual IEnumerator populate()
 	{
 		makerobj = new GameObject("maker");
-		makerobj.transform.position = transform.position;
+		makerobj.AddComponent<cellmakeraction>();
+		makeractionref = makerobj.GetComponent<cellmakeraction>();
 
+		makerobj.transform.position = transform.position;
 
 		for(int i = 0; i<=requiredpower;i++)
 		{
 			GameObject ele = Instantiate(elementobj,transform.position,transform.rotation) as GameObject;
 			//very temporary
-			int a = Random.Range(0,1);
-			if(a ==0)
-			{
-				ele.GetComponent<elementaction>().purestate = true;
-			}else
-			{
-				ele.GetComponent<elementaction>().purestate = false;
-			}
+//			int a = Random.Range(0,1);
+//			if(a ==0)
+//			{
+//				ele.GetComponent<elementaction>().purestate = true;
+//			}else
+//			{
+//				ele.GetComponent<elementaction>().purestate = false;
+//			}
 			//very temporary
 			ele.transform.parent = makerobj.transform;
-			yield return new WaitForSeconds(.5f);
+			yield return new WaitForSeconds(.2f);
 		}
 
 		for(int i = 0; i<5;i++)
 		{
 			GameObject cen = Instantiate(centralobj,transform.position,transform.rotation) as GameObject; 
 			cen.transform.parent = makerobj.transform;
-			yield return new WaitForSeconds(.5f);
+			yield return new WaitForSeconds(.2f);
 		}
 
 		int count = Random.Range(1,10);
@@ -84,9 +98,18 @@ public class cellaction : MonoBehaviour {
 		{
 			GameObject bulb = Instantiate(bulbobj,transform.position,transform.rotation) as GameObject;
 			bulb.transform.parent = makerobj.transform;
-			yield return new WaitForSeconds(.5f);
+			yield return new WaitForSeconds(.2f);
 		}
+		makeractionref.allfinishedmaking = true;
+	}
 
+	public void talktomaker()
+	{
+		if(makeractionref.allfinishedmaking)
+		{
+			makeractionref.gatherchildren();
+			print("gathering children");
+		}
 	}
 
 	public virtual void finishedcell()
@@ -94,13 +117,12 @@ public class cellaction : MonoBehaviour {
 	//	returnobj.SetActive(true);
 
 		cellskinobj.GetComponent<MeshRenderer>().material.color = finishedcellskin;
-
+		areamanagerref.completearealevelamount += requiredpower;
 	}
 
 	public virtual void Update()
 	{
-		//returnobj.transform.position = returnobjlocation;
-
+		 
 		if(playerinteraction.lookedatobj == transform.gameObject)
 		{
 			acklook = true;
@@ -121,12 +143,71 @@ public class cellaction : MonoBehaviour {
 			finishedcell();
 		}
 
+	
+			
+		if(cellOptionOn)
+		{
+			celloptionobj.SetActive(true);
+		}
+		else
+		{
+			celloptionobj.SetActive(false);
+		}
+
+		if(swipeRotationOn)
+		{
+			RotatebySwipe(swipedirection,swipevalue);
+		}
+
+
+
+		// not being used anymore
 		if(dorotate)
 		{
 			rotatecell();
 		}
-			
 	}
+		
+	// still functioning code
+	public virtual void leavecell()
+	{
+
+		gmanager.playerobj.transform.position = gmanager.lastjumplocation;
+		gmanager.playerobj.transform.rotation = gmanager.lastjumprotation;
+
+	}
+
+	public virtual Vector3 arriveincelllocation()
+	{
+		return spawnloc.position;
+	}
+
+	public virtual Quaternion arriveincellrotation()
+	{
+		return spawnloc.rotation;
+	}
+
+	public virtual void RotatebySwipe(int direction,float swipevalue)
+	{
+		float speed =50;
+	 
+		switch (direction)
+		{
+			case 1:
+			transform.Rotate(transform.right, swipevalue *speed *Time.deltaTime);
+				break;
+			case 2:
+			transform.Rotate(transform.up,swipevalue*speed * Time.deltaTime);
+				break;
+		}
+
+
+	 }
+
+
+
+
+// old rotate code
 
 	public virtual void getrotateready(Vector3 lookpoint)
 	{
@@ -149,22 +230,4 @@ public class cellaction : MonoBehaviour {
 
 	}
 
-	public virtual void leavecell()
-	{
-
-		gmanager.playerobj.transform.position = gmanager.lastjumplocation;
-		gmanager.playerobj.transform.rotation = gmanager.lastjumprotation;
-//		print(gmanager.lastjumplocation);
-//		print(gmanager.lastjumprotation);
-	}
-
-	public virtual Vector3 arriveincelllocation()
-	{
-		return spawnloc.position;
-	}
-
-	public virtual Quaternion arriveincellrotation()
-	{
-		return spawnloc.rotation;
-	}
 }
