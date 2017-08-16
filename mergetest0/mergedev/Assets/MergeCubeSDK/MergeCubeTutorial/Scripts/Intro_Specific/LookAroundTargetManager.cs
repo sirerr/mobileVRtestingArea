@@ -21,19 +21,20 @@ public class LookAroundTargetManager : MonoBehaviour
 		currentHoveredOn = 0;
 		SpawnTarget();
 	}
+		
 
-
+	GameObject currentTarget;
 	public GameObject SpawnTarget()
 	{
-		GameObject newTarget = (GameObject)Instantiate(floatingTargetPrefab, this.transform.position, new Quaternion());
-		newTarget.transform.parent = this.transform;
-		ChooseRandomPosition(newTarget);
+		currentTarget = (GameObject)Instantiate(floatingTargetPrefab, this.transform.position, new Quaternion());
+		currentTarget.transform.parent = this.transform;
+		ChooseRandomPosition(currentTarget);
 		if (LRController != null)
 		{
-			LRController.SetCurrentTargetPos(newTarget);
+			LRController.SetCurrentTargetPos(currentTarget);
 			LRController.EnableLine();
 		}
-		return newTarget;
+		return currentTarget;
 	}
 
 
@@ -60,7 +61,6 @@ public class LookAroundTargetManager : MonoBehaviour
 
 		lastTargetPos = new Vector3(x, 0, z);
 
-		//newTarget.transform.localPosition += lastTargetPos;
 		newTarget.transform.localPosition = new Vector3(lastTargetPos.x, y, lastTargetPos.z);
 		lastTargetPos = newTarget.transform.localPosition;
 	}
@@ -108,10 +108,6 @@ public class LookAroundTargetManager : MonoBehaviour
 
 	public void UpdateRotation()
 	{
-		//		this.transform.localRotation = Quaternion.Euler(Camera.main.transform.eulerAngles.x, 
-		//			Camera.main.transform.eulerAngles.y, 
-		//			transform.eulerAngles.z);
-
 		this.transform.localRotation = Quaternion.Euler(0, 
 			Camera.main.transform.eulerAngles.y, 
 			transform.eulerAngles.z);

@@ -1,5 +1,44 @@
-Input Tool Scripts
+MergeCubeSDK V1.1.2
+====================================================================================================================================
+Merge User Account:
+	Merge User Account is optional to Use.
+    Add documents for user account system.
+    Add debug mode so user account will not popup all the time.
+    Add user account documentation to explane how to use user account.
+GazeCaster:
+    Change when it is in full screen you can tap anywhere to "click".   
+MergeMultiTarget: 
+	Add option DoNothing and DisableSelect.
+		DoNothing will let you have full control how you want to handle your objects when marker find/loss tracking.
+		DisableSelect will disable the gameobjects you select(refenced in scene) when loss tracking, and enable them when find.
 
+====================================================================================================================================
+
+MergeCubeSDK V1.1.1
+====================================================================================================================================
+Fix core issue.
+Fix Merge User Account signin issue.
+Update Merge Development Key system.
+====================================================================================================================================
+
+MergeCubeSDK v1.1.0
+====================================================================================================================================
+Brand new SDK system.
+Add Merge User Account.
+Add Multi Cube Support.
+Add Multi Headset Support.
+New Tutorial.
+New Intro Sequence.
+====================================================================================================================================
+
+====================================================================================================================================
+
+Before releasing your app on the Apple App Store or the Google Play Store, 
+please consider purchasing the "In-App Web Browser": https://www.assetstore.unity3d.com/en/#!/content/57532 
+
+====================================================================================================================================
+
+Input Tool Scripts:
 How to Use:
 
 GazeCaster:

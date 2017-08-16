@@ -30,40 +30,64 @@ public class IntroGazeCaster : MonoBehaviour
 	public event GazeEvent OnGaze_InputDown;
 	public event GazeEvent OnGaze_InputUp;
 
-	public bool isMonoScreenMode = false;
-	public void SwapScreenViewMode()
-	{
-		isMonoScreenMode = !isMonoScreenMode;
-//		Debug.Log("is mono screen mode? " + isMonoScreenMode);
-	}
-
+	/// <summary>
+	/// Set This When Start Tutorial
+	/// </summary>
+	public bool isFullScreen = false;
+	/// <summary>
+	/// Set This when need switch between center ray all the time or tap to ray.
+	/// </summary>
+	public bool isFullScreenCenterRayAllTime = false;
+	/// <summary>
+	/// The only work in full screen mode. When active both point click and tap will work.
+	/// </summary>
+	public bool isBothClickMode = false;
 
 	void Update ()
 	{
 		Ray ray = new Ray ();
 
 		//Set up the ray to aim either at the screen position for tapping in Mono screen or for forward gaze direction for dual screen
-		if (isMonoScreenMode) 
+		if (isFullScreen) 
 		{
-			ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+			if (isFullScreenCenterRayAllTime) {
+				ray.origin = this.transform.position;
+				ray.direction = this.transform.forward;
+			} else {
+				if (Input.GetMouseButtonDown (0)) {
+					ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+					if (isBothClickMode) {
+						Debug.LogWarning ("In Click");
+						RaycastHit hitB;
+						if (Physics.Raycast (new Ray (transform.position, transform.forward), out hitB, 100000f, lMask)) {
+							Debug.LogWarning ("Hit");
+							if (hitB.transform.GetComponent<IntroGazeResponder> () != null) {
+								Debug.LogWarning ("Have Receiver");
+								hitB.transform.GetComponent<IntroGazeResponder> ().OnGazeEnter ();
+								hitB.transform.GetComponent<IntroGazeResponder> ().OnGazeTrigger ();
+							}
+						}
+					}
+				} else {
+					return;
+				}
+			}
+
 		} 
 		else 
 		{
 			ray.origin = this.transform.position;
 			ray.direction = this.transform.forward;
 		}
-			
+	
 		if (Physics.Raycast (ray, out hit, 100000f, lMask)) 
 		{                                  
 			Debug.DrawRay(ray.origin, ray.direction);
 
-			//The thing we are looking at isnt the same guy!!
 			if (hit.transform.gameObject != gazedObject)
 			{
-				//Stop looking at the old guy! Tell him to go away.
 				if (gazeResponder != null)
 				{
-//					Debug.Log("Gaze End");
 					gazeResponder.OnGazeExit();
 
 					if ( OnGaze_End != null)
@@ -72,15 +96,11 @@ public class IntroGazeCaster : MonoBehaviour
 					}
 				}
 
-//				Debug.Log("Cleaned CurGaze");
-				//Clean up for the new guy
 				currentlyGazing = false;
 				gazedObject = hit.transform.gameObject;
 				gazeResponder = hit.transform.GetComponent<IntroGazeResponder>();
 			}
 				
-			//We were  NOT previously looking at something last tick, so lets have it do stuff
-			//I must be looking at something new, look at the new thing.
 			if (!currentlyGazing && gazedObject != null && gazeResponder != null )
 			{
 //				Debug.Log("Gaze Start");
@@ -127,9 +147,8 @@ public class IntroGazeCaster : MonoBehaviour
 //			Debug.Log("END TAP");
 			TriggerReleased();
 
-			if (isMonoScreenMode)
+			if (isFullScreen)
 			{
-//				Debug.Log("Is mono screen mode? " + isMonoScreenMode);
 				currentlyGazing = false;
 				gazedObject = null;
 				gazeResponder = null;

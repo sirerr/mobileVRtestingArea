@@ -5,9 +5,9 @@ using UnityEngine;
 public class LineRendererController: MonoBehaviour 
 {
 
-	public GameObject startPosGO, moveCubeStartPosGO;
-
-	[HideInInspector]
+	public GameObject startPosGO;
+	GameObject moveCubeStartPosGO;
+//	[HideInInspector]
 	public GameObject currentTarget;
 
 	public LineRenderer lr;
@@ -16,6 +16,7 @@ public class LineRendererController: MonoBehaviour
 	float startingLRLength, startingXTilingValue, startingScrollSpeed;
 	void Start () 
 	{
+		moveCubeStartPosGO = MergeMultiTarget.instance.gameObject;
 		startingLRLength = GetLineRendererDistance();
 		startingXTilingValue = GetTextureXTiling();
 		startingScrollSpeed = st.scrollSpeed;
@@ -155,7 +156,7 @@ public class LineRendererController: MonoBehaviour
 	public float xMaxValue = 0.5f;
 	public float yMaxValue = 0.35f;
 
-	public GameObject leftLens;
+//	public GameObject leftLens;
 	public void SetTargetPosGOLocation()
 	{
 		//get target's screen position

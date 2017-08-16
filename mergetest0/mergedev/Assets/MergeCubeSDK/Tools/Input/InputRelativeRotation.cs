@@ -42,8 +42,8 @@ public class InputRelativeRotation : MonoBehaviour
 		rotationTracker.localRotation = Quaternion.identity;
 		rotationTracker.localScale = Vector3.one;
 
-		GetComponent<BasicTrackableEventHandler>().OnTrackingFound += OnTrackingFound;
-		GetComponent<BasicTrackableEventHandler>().OnTrackingLost += OnTrackingLost;
+		GetComponent<MergeMultiTarget>().OnTrackingFound += OnTrackingFound;
+		GetComponent<MergeMultiTarget>().OnTrackingLost += OnTrackingLost;
 	}
 
 	void OnTrackingFound()

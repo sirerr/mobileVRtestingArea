@@ -9,7 +9,7 @@ namespace Utilities
 
 		void Start()
 		{
-			target = GameObject.Find("MultiTarget").transform;
+			target = MergeMultiTarget.instance.transform;
 		}
 
 		void LateUpdate () 
