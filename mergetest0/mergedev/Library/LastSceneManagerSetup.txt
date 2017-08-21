@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/MergeCubeSDK/A_QuickStart/QuickStart.unity
+- path: Assets/Scenes/manualSetupscene0.unity
   isLoaded: 1
   isActive: 1
