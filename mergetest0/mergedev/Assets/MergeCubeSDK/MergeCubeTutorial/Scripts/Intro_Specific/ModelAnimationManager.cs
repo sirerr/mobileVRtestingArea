@@ -5,14 +5,23 @@ using UnityEngine;
 public class ModelAnimationManager : MonoBehaviour 
 {
 
-	public Animator modelAnimator;
+	public Animator headsetModelAnimator, phoneModelAnimator;
+	Animator activeModelAnimator;
+
 	string animTag = "Tutorial_Anim";
 	public List<GameObject> floatingTargets = new List<GameObject>();
 
-	GameObject multiTarget;
 	void Awake()
 	{
-		multiTarget = GameObject.Find("MultiTarget");
+		activeModelAnimator = headsetModelAnimator;
+
+		headsetModelAnimator.gameObject.SetActive (Merge.MergeCubeSDK.instance.viewMode == Merge.MergeCubeSDK.ViewMode.HEADSET);
+		phoneModelAnimator.gameObject.SetActive (Merge.MergeCubeSDK.instance.viewMode != Merge.MergeCubeSDK.ViewMode.HEADSET);
+
+		if(Merge.MergeCubeSDK.instance.viewMode == Merge.MergeCubeSDK.ViewMode.FULLSCREEN)
+		{
+			activeModelAnimator = phoneModelAnimator;
+		}
 	}
 
 	bool isInit = false;
@@ -21,7 +30,6 @@ public class ModelAnimationManager : MonoBehaviour
 		if (!isInit) {
 			isInit = true;
 			transform.parent.FaceToCamera (this.transform);
-			//Merge.CubeOrientation.OrientateToCamera(multiTarget.transform, transform.parent);
 		}
 	}
 		
@@ -29,10 +37,10 @@ public class ModelAnimationManager : MonoBehaviour
 	AnimatorStateInfo currentState;
 	public void ResetCurrentState()
 	{
-		currentState = modelAnimator.GetCurrentAnimatorStateInfo(0);
+		currentState = activeModelAnimator.GetCurrentAnimatorStateInfo(0);
 		if(currentState.IsTag(animTag))
 		{
-			modelAnimator.Play(currentState.fullPathHash, -1, 0f);
+			activeModelAnimator.Play(currentState.fullPathHash, -1, 0f);
 		}
 	}
 
@@ -41,26 +49,26 @@ public class ModelAnimationManager : MonoBehaviour
 	{
 		switch (stateIndex) {
 		case 0:
-			modelAnimator.SetTrigger ("0");
+			activeModelAnimator.SetTrigger ("0");
 			break;
 		case 1:
-			modelAnimator.SetTrigger ("1");
+			activeModelAnimator.SetTrigger ("1");
 			break;
 		case 2:
-			modelAnimator.SetTrigger ("2");
+			activeModelAnimator.SetTrigger ("2");
 			break;
 		case 3:
-			modelAnimator.SetTrigger ("3");
+			activeModelAnimator.SetTrigger ("3");
 			break;
 		case 4: 
 			DisableFloatingTargets();
-			modelAnimator.SetTrigger ("4");
+			activeModelAnimator.SetTrigger ("4");
 			break;
 		case 5: 
-			modelAnimator.SetTrigger ("5");
+			activeModelAnimator.SetTrigger ("5");
 			break;
 		case 6: 
-			modelAnimator.SetTrigger ("6");
+			activeModelAnimator.SetTrigger ("6");
 			break;
 		default:
 			Debug.Log ("Animation change failure.");

@@ -26,7 +26,7 @@ public class InputVelocity : MonoBehaviour
 	//This is the scene's BasicTrackableEventHandler script that
 	//allows us to implement behaviour for when the cube is and
 	//isn't being tracked.
-	public BasicTrackableEventHandler imageTarget;
+	public MergeMultiTarget imageTarget;
 
 	public bool shouldCooldown = false;
 	public float cooldownDuration = 1f;

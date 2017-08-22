@@ -12,12 +12,11 @@ public class MergeTutorial : MonoBehaviour
 	void Awake()
 	{
 		s_ins = this;
+	}
 
-		if (startImmediately)
-		{
-			StartTutorial();
-		}
-
+	void SetFullScreenVariables()
+	{
+		step3_cursor.GetComponent<SpriteRenderer> ().sprite = fullscreenCursor;
 	}
 
 
@@ -27,23 +26,32 @@ public class MergeTutorial : MonoBehaviour
 	}
 
 
-	public Callback OnIntroDone;
+	public Callback OnTutorialComplete;
 //	public bool initAwake = true;
-	public bool skipIntro = false;
-	public bool startImmediately = false;
-	public GameObject customReticle;
+//	public GameObject customReticle;
 
 	[Space(40)]
 
 	public PositionToParent[] objsToReparent;
 	public GameObject cubeObjRoot;
 	public GameObject subRoot;
-	private GameObject multiTarget;
+
 	bool isInitialized = false;
 
-	[HideInInspector]
-	public IntroTrackableEventHandler myTrackingSystem;
+	public void StartTutorial(bool isFullScreen)
+	{
+		this.transform.GetChild(0).gameObject.SetActive(true);
 
+		gazeCaster.GetComponent<IntroGazeCaster> ().isFullScreen = isFullScreen;
+		if (isFullScreen) {
+			ReplaceAudioClips ();
+			SetFullScreenVariables ();
+		}
+
+		SetupIntro();
+		MergeReticle.instance.ActiveIt (false);
+		StartCoroutine (IntroSeq ());
+	}
 
 	public void SetupIntro()
 	{
@@ -52,25 +60,17 @@ public class MergeTutorial : MonoBehaviour
 			objsToReparent[index].ApplyReparenting();
 		}
 
-//		if (skipIntro)
-//		{
-//			IntroDone();
-//			return;
-//		}
-
-		multiTarget = GameObject.Find("MultiTarget");
 		AddIntroEventHandler();
-		myTrackingSystem = multiTarget.GetComponent<IntroTrackableEventHandler>();
 
-		myTrackingSystem.OnTrackingFound += OnTrackingFound;
-		myTrackingSystem.OnTrackingLost += OnTrackingLost;
+		MergeMultiTarget.instance.OnTrackingFound += OnTrackingFound;
+		MergeMultiTarget.instance.OnTrackingLost += OnTrackingLost;
 
 		audioPlayer = GetComponent<AudioSource> ();
 		Debug.Log("Grabbed audio source: " + audioPlayer);
-		if (customReticle != null)
-		{
-			customReticle.SetActive(false);
-		}
+//		if (customReticle != null)
+//		{
+//			customReticle.SetActive(false);
+//		}
 
 		tutorialModel = tutorialModelRoot.GetComponent<ModelAnimationManager>();
 		if (LRController != null)
@@ -84,34 +84,23 @@ public class MergeTutorial : MonoBehaviour
 
 	void AddIntroEventHandler()
 	{
-		multiTarget.AddComponent<IntroTrackableEventHandler>();
+		MergeMultiTarget.instance.gameObject.AddComponent<IntroTrackableEventHandler>();
 	}
 
 
 	void RemoveIntroEventHandler()
 	{
-		Destroy(multiTarget.GetComponent<IntroTrackableEventHandler>());
+		Destroy(MergeMultiTarget.instance.gameObject.GetComponent<IntroTrackableEventHandler>());
 	}
 
 
-	public void StartTutorial()
-	{
-		if (skipIntro)
-		{
-			IntroDone();
-			return;
-		}
-		else
-		{
-			SetupIntro();
-			StartCoroutine (IntroSeq ());
-		}
-	}
+
 
 	public GameObject step1_scanToBegin;
 	public GameObject step1_scanner;
 	public GameObject step2_clickBtnToBeginText;
 	public GameObject step3_cursor;
+	public Sprite fullscreenCursor;
 	public GameObject step3_cursorHighlight; 
 	public GameObject step3_cursorHighlightText;
 	public GameObject step3_targetCube;
@@ -132,10 +121,11 @@ public class MergeTutorial : MonoBehaviour
 	public GameObject tutorialModelRoot;
 	ModelAnimationManager tutorialModel;
 
-	public AudioClip [] voiceOver;
+	public AudioClip[] voiceOver;
+	public AudioClip[] replacementAudioClips;
 	public AudioClip stepCompleteSFX;
 
-	public GameObject gazeCaster;//, dimmer;
+	public GameObject gazeCaster;
 
 
 
@@ -151,18 +141,7 @@ public class MergeTutorial : MonoBehaviour
 
 	public bool HeadTrackingFlag()
 	{
-		bool headTrackingEnabled;
-
-		if (VuforiaARController.Instance.WorldCenterModeSetting == VuforiaARController.WorldCenterMode.DEVICE_TRACKING)
-		{
-			headTrackingEnabled = true;
-		}
-		else
-		{
-			headTrackingEnabled = false;
-		}
-
-		return headTrackingEnabled;
+		return (VuforiaARController.Instance.WorldCenterModeSetting == VuforiaARController.WorldCenterMode.DEVICE_TRACKING);
 	}
 
 
@@ -170,6 +149,7 @@ public class MergeTutorial : MonoBehaviour
 	AudioSource audioPlayer;
 	bool nextStep = false;
 	int currentAnimIndex;
+	bool isInLookOrMove = false;
 	IEnumerator IntroSeq()
 	{
 
@@ -222,6 +202,13 @@ public class MergeTutorial : MonoBehaviour
 		//Use cursor to look at front target
 		//=======================================================================
 		//pop up cursor
+
+		if (gazeCaster.GetComponent<IntroGazeCaster> ().isFullScreen == true) 
+		{
+			gazeCaster.GetComponent<IntroGazeCaster>().isBothClickMode = true;	
+		}
+
+
 		Debug.Log("Cursor enabled");
 		step3_cursor.SetActive(true);
 
@@ -239,7 +226,7 @@ public class MergeTutorial : MonoBehaviour
 
 		yield return new WaitForSeconds (.5f);
 		step3_targetCube.SetActive(true);
-		yield return new WaitForSeconds (3.5f);
+		yield return new WaitForSeconds (voiceOver[2].length);
 
 		step3_frontTarget.GetComponent<BoxCollider> ().enabled = true;
 
@@ -300,9 +287,21 @@ public class MergeTutorial : MonoBehaviour
 		yield return new WaitUntil(() => tutorialModelRoot.GetComponent<YAxisRotation>().isDoneRotating == true);
 
 
+		if (gazeCaster.GetComponent<IntroGazeCaster> ().isFullScreen == true) 
+		{
+			gazeCaster.GetComponent<IntroGazeCaster> ().isBothClickMode = false;	
+		}
+
+
 		//Device Tracking Check
 		if(HeadTrackingFlag())
 		{
+			if (gazeCaster.GetComponent<IntroGazeCaster> ().isFullScreen == true) 
+			{
+				gazeCaster.GetComponent<IntroGazeCaster> ().isFullScreenCenterRayAllTime = true;
+			}
+
+			isInLookOrMove = true;
 			if(LRController != null)
 			{
 				LRController.SetActive(true);	
@@ -311,6 +310,7 @@ public class MergeTutorial : MonoBehaviour
 			//Look around at floating targets
 			//=======================================================================
 			//enable front target and disable back target for later check
+
 
 			step4_backTarget.GetComponent<BoxCollider> ().enabled = false;
 			step4_backTarget.SetActive(false);
@@ -349,23 +349,30 @@ public class MergeTutorial : MonoBehaviour
 			step5_lookAroundTargets.SetActive(false);
 
 			//activate overlay ui to tell user to look at cube again
-			if (myTrackingSystem.isTracking == false)
+			if (MergeMultiTarget.instance.isTracking == false)
 			{
+				step3_cursor.SetActive (false);
 				step5_returnToCubeText.SetActive(true);
-
 				//Voice line
 				PlayVoiceOver(5);
 			}
 
-			yield return new WaitUntil(() => myTrackingSystem.isTracking);
-
+			yield return new WaitUntil(() => MergeMultiTarget.instance.isTracking);
+			step3_cursor.SetActive (true);
 			hologramBoxCollider.enabled = false;
+
+			if (gazeCaster.GetComponent<IntroGazeCaster> ().isFullScreen == true) 
+			{
+				gazeCaster.GetComponent<IntroGazeCaster> ().isFullScreenCenterRayAllTime = false;
+			}
 
 			//Move cube around to highlighted areas
 			//=======================================================================
 			//reorientate cube to face user
 			cubeObjRoot.transform.FaceToCamera(tutorialModelRoot.transform);
 			//Merge.CubeOrientation.OrientateToCamera(multiTarget.transform, cubeObjRoot.transform);
+
+			isInLookOrMove = true;
 
 			//cancel "look at cube again" voice line
 			audioPlayer.Stop ();
@@ -407,46 +414,53 @@ public class MergeTutorial : MonoBehaviour
 		}
 
 
+		isInLookOrMove = true;
 		//Click front cube target
 		//=======================================================================
 		//reactivate the target on the cube
 		//enable main cube collider
-		hologramBoxCollider.enabled = true;
+//		hologramBoxCollider.enabled = true;
+//
+//		step6_moveCubeCanvasesRoot.SetActive(false);
+//		step6_moveCubeText.SetActive(false);
+//
+//		//click target to continue
+//		step3_targetCube.SetActive(true);
+//		step3_frontTarget.SetActive(true);
+//		step4_backTarget.SetActive(false);
+//
+//		step3_frontTarget.GetComponent<BoxCollider> ().enabled = true;
+//
+//		step7_clickFrontTargetText.SetActive (true);
+//
+//		//Voice line
+//		PlayVoiceOver(7);
+//
+//		//play animation
+//		tutorialModel.setState(5);
+//		currentAnimIndex = 5;
+//
+//		//Point on front target and click
+//		frontTargetClicked = false;
+//		StartCoroutine(WaitForPointAndClickFrontTarget());
+//		yield return new WaitUntil (() => nextStep);
+//		nextStep = false;
+//
+//		//play step complete sfx
+//		PlayStepCompleteSFX();
+//		yield return new WaitForSeconds(1.0f);
 
+
+		//Click Start button
+		//=======================================================================
 		step6_moveCubeCanvasesRoot.SetActive(false);
 		step6_moveCubeText.SetActive(false);
-
-		//click target to continue
-		step3_targetCube.SetActive(true);
-		step3_frontTarget.SetActive(true);
-		step4_backTarget.SetActive(false);
-
-		step3_frontTarget.GetComponent<BoxCollider> ().enabled = true;
-
-		step7_clickFrontTargetText.SetActive (true);
-
-		//Voice line
-		PlayVoiceOver(7);
-
-		//play animation
-		tutorialModel.setState(5);
-		currentAnimIndex = 5;
-
-		//Point on front target and click
-		frontTargetClicked = false;
-		StartCoroutine(WaitForPointAndClickFrontTarget());
-		yield return new WaitUntil (() => nextStep);
-		nextStep = false;
-
-		//play step complete sfx
-		PlayStepCompleteSFX();
-		yield return new WaitForSeconds(1.0f);
-
-
-		//Click UI Arrow
-		//=======================================================================
 		step7_clickFrontTargetText.SetActive (false);
 		step3_targetCube.SetActive(false);
+		step4_backTarget.SetActive(false);
+
+//		step6_moveCubeText.SetActive(false);
+//		hologramBoxCollider.enabled = true;
 
 		//pop UI, tell user click ui to start
 		yield return new WaitForSeconds (.5f);
@@ -467,6 +481,8 @@ public class MergeTutorial : MonoBehaviour
 		PlayStepCompleteSFX();
 		yield return new WaitForSeconds(1.0f);
 
+		PlayVoiceOver(9);
+		yield return new WaitForSeconds (voiceOver [9].length + .35f);
 
 		//Start Preview app
 		//=======================================================================
@@ -475,7 +491,7 @@ public class MergeTutorial : MonoBehaviour
 		tutorialModelRoot.SetActive(false);
 
 		//done
-		IntroDone();
+		EndTutorial();
 		yield return null;
 	}
 
@@ -489,7 +505,7 @@ public class MergeTutorial : MonoBehaviour
 			{
 				waitCount += Time.deltaTime;
 			}
-			yield return new WaitForFixedUpdate ();
+			yield return null;
 		}
 		nextStep = true;
 		yield return null;
@@ -503,10 +519,10 @@ public class MergeTutorial : MonoBehaviour
 		pointCounter += Time.deltaTime;
 	}
 
-
+	float pointerDuration = .5f;
 	IEnumerator WaitForPointAtCubeTarget()
 	{
-		yield return new WaitUntil (() => pointCounter>=.5f);
+		yield return new WaitUntil (() => pointCounter >= pointerDuration);
 		nextStep = true;
 		yield return null;
 	}
@@ -543,17 +559,18 @@ public class MergeTutorial : MonoBehaviour
 
 
 	bool frontTargetClicked = false;
-	public void FrontTargetClicked(){
+	public void TargetClicked(){
 		frontTargetClicked = true;
 	}
 
 
-	IEnumerator WaitForPointAndClickFrontTarget()
-	{
-		yield return new WaitUntil (() => frontTargetClicked);
-		nextStep = true;
-		yield return null;
-	}
+//	IEnumerator WaitForPointAndClickTarget()
+//	{
+//		yield return new WaitUntil (() => frontTargetClicked);
+//		nextStep = true;
+//		frontTargetClicked = false;
+//		yield return null;
+//	}
 
 
 	bool arrowClicked = false;
@@ -577,7 +594,11 @@ public class MergeTutorial : MonoBehaviour
 		isTracking = true;
 		cubeObjRoot.SetActive (true);
 		subRoot.SetActive (true);
-		tutorialModel.setState(currentAnimIndex);
+		if(tutorialModel.gameObject.activeInHierarchy == true)
+		{
+			tutorialModel.setState(currentAnimIndex);
+		}
+		hologramBoxCollider.enabled = !isInLookOrMove;
 	}
 
 
@@ -602,23 +623,31 @@ public class MergeTutorial : MonoBehaviour
 	}
 
 
-	public void IntroDone()
+	void ReplaceAudioClips()
 	{
-		if (OnIntroDone != null)
+		voiceOver[1] = replacementAudioClips[0];
+		voiceOver[2] = replacementAudioClips[1];
+		voiceOver[3] = replacementAudioClips[2];
+		voiceOver[7] = replacementAudioClips[3];
+		voiceOver[8] = replacementAudioClips[4];
+	}
+
+
+	public void EndTutorial()
+	{
+		MergeReticle.instance.ActiveIt (true);
+		if (OnTutorialComplete != null)
 		{
-			OnIntroDone.Invoke();
+			OnTutorialComplete.Invoke();
 		}
 
-		if (skipIntro == false)
-		{
-			myTrackingSystem.RemoveTrackingLogic();
-			RemoveIntroEventHandler();
-		}
-
-		if (customReticle != null)
-		{
-			customReticle.SetActive(true);
-		}
+		MergeMultiTarget.instance.OnTrackingFound -= OnTrackingFound;
+		MergeMultiTarget.instance.OnTrackingLost -= OnTrackingLost;
+		RemoveIntroEventHandler();
+//		if (customReticle != null)
+//		{
+//			customReticle.SetActive(true);
+//		}
 
 		//		dimmer.SetActive(false);
 		step3_cursor.SetActive (true);

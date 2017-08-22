@@ -43,8 +43,8 @@ public class PositionToParent : MonoBehaviour
 			case parentObjects.ARCamera:
 				parent = Camera.main.transform;
 				break;
-			case parentObjects.MultiTarget:
-				parent = GameObject.Find("MultiTarget").transform;
+		case parentObjects.MultiTarget:
+				parent = MergeMultiTarget.instance.transform;
 				break;
 			default:
 				Debug.Log("ERROR: Something bad happened to " + this.gameObject.name + "'s parenting");

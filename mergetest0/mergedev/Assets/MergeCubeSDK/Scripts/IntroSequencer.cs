@@ -19,31 +19,87 @@ public class IntroSequencer : MonoBehaviour
 		DontDestroyOnLoad(gameObject);
 	}
 
+	//This allows the intro sequence to play out of the box with no other managers handling calling it's start.
 	public bool shouldAutoStart = true;
+	public Callback OnIntroSequenceComplete;
 
 	void Start()
 	{
-		if(shouldAutoStart)
-			StartIntroSequencer();
+		Merge.MergeCubeSDK.instance.OnInitializationComplete += SignalSDKReady;
+
+		if (shouldAutoStart)
+			StartCoroutine(WaitForSDKInit());
+	}
+		
+	bool mergeCubeSDKReady = false;
+	void SignalSDKReady()
+	{
+		mergeCubeSDKReady = true;
 	}
 
-	public Callback OnIntroSequenceComplete;
 	public void StartIntroSequencer()
 	{
-		SplashScreenManager.instance.OnSplashSequenceEnd += StartSocialLogin;
-		ViewModeSelectionManger.instance.OnStartGame += StartGame;
+		StartCoroutine(WaitForSDKInit());
+	}
+
+	IEnumerator WaitForSDKInit()
+	{
+		yield return new WaitUntil( () => mergeCubeSDKReady );
+		BeginSequencer();
+	}
+
+	//Entry
+	void BeginSequencer()
+	{
+		Screen.autorotateToLandscapeLeft = false;
+		Screen.autorotateToLandscapeRight = false;
+		Screen.autorotateToPortrait = true;
+		Screen.autorotateToPortraitUpsideDown = false;
+
+		Merge.MergeCubeSDK.instance.RemoveMenuElement(Merge.MergeCubeSDK.instance.viewSwitchButton);
+
+		SplashScreenManager.instance.OnSplashSequenceEnd += HandleSplashSequenceComplete;
+		TitleScreenManager.instance.OnTitleSequenceComplete += HandleTitleSequenceComplete;
 
 		SplashScreenManager.instance.StartSplashSequence();
 	}
 
-	void StartSocialLogin()
+	void HandleSplashSequenceComplete()
 	{
-		ViewModeSelectionManger.instance.ShowViewChoicePanel();
+		TitleScreenManager.instance.ShowTitleScreen();
 	}
 
-	void StartGame()
+	void HandleTitleSequenceComplete( bool shouldPlayTutorial )
 	{
-		if (OnIntroSequenceComplete != null)
+		if (shouldPlayTutorial)
+		{
+			MergeTutorial.ins.OnTutorialComplete += HandleTutorialSequenceComplete;
+
+			if (!PlayerPrefs.HasKey("HasPlayedBefore"))
+			{
+				PlayerPrefs.SetString("HasPlayedBefore", "true");
+			}
+
+			MergeTutorial.ins.StartTutorial(Merge.MergeCubeSDK.instance.viewMode == MergeCube.MergeCubeBase.ViewMode.FULLSCREEN);
+
+		}
+		else 
+		{
+			EndIntroSequence();
+		}
+	}
+
+	void HandleTutorialSequenceComplete()
+	{
+		EndIntroSequence();
+	}
+		
+	//Exit
+	void EndIntroSequence()
+	{
+		Merge.MergeCubeSDK.instance.AddMenuElement(Merge.MergeCubeSDK.instance.viewSwitchButton, 3);
+
+		if(OnIntroSequenceComplete != null)
 		{
 			OnIntroSequenceComplete.Invoke();
 		}

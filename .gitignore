@@ -22,8 +22,7 @@ Thumbs.db
 *.lib
 *.sbr
 
-/[Ll]ibrary/
-/daydreamdevarea/broken/unitycore1/clarity
+/mergetest0/mergedev/Library
 /[Tt]emp/
 /[Oo]bj/
 /[Bb]uild/

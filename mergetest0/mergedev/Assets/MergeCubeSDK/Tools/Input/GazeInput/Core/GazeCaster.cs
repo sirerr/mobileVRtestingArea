@@ -30,20 +30,21 @@ public class GazeCaster : MonoBehaviour
 	public event GazeEvent OnGaze_InputDown;
 	public event GazeEvent OnGaze_InputUp;
 
-	public bool isMonoScreenMode = false;
-	public void SwapScreenViewMode()
+	bool isVRMode = false;
+	public void SwapScreenViewMode(bool isVRModeTp)
 	{
-		isMonoScreenMode = !isMonoScreenMode;
-//		Debug.Log("is mono screen mode? " + isMonoScreenMode);
+		isVRMode = isVRModeTp;
 	}
 
-
+	void Start(){
+		Merge.MergeCubeSDK.instance.OnViewModeSwap += SwapScreenViewMode;
+	}
 	void Update ()
 	{
 		Ray ray = new Ray ();
 
 		//Set up the ray to aim either at the screen position for tapping in Mono screen or for forward gaze direction for dual screen
-		if (isMonoScreenMode) 
+		if (!isVRMode) 
 		{
 			ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		} 
@@ -129,7 +130,7 @@ public class GazeCaster : MonoBehaviour
 //			Debug.Log("END TAP");
 			TriggerReleased();
 
-			if (isMonoScreenMode)
+			if (isVRMode)
 			{
 //				Debug.Log("Is mono screen mode? " + isMonoScreenMode);
 				currentlyGazing = false;

@@ -27,11 +27,11 @@ public class LookAroundTargetControl : MonoBehaviour
 			GetComponent<Renderer> ().material.color = Color.green;
 
 			parent.IncCheckHoverFlags();
-			//transform.parent = null;
 
 			StartCoroutine(DelayedAnim());
 		}
 	}
+
 
 	public IEnumerator DelayedAnim()
 	{

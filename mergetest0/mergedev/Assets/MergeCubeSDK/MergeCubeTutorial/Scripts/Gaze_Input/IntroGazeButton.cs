@@ -21,6 +21,8 @@ public class IntroGazeButton : MonoBehaviour, IntroGazeResponder
 
 	public void OnGazeTrigger()
 	{
+//		Debug.LogWarning ("Trigger - "+transform.name);
+
 		OnGazeInput.Invoke();
 	}
 

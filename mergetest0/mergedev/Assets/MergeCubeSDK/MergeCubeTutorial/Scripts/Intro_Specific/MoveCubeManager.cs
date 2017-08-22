@@ -5,7 +5,6 @@ using UnityEngine;
 public class MoveCubeManager : MonoBehaviour 
 {
 
-	IntroTrackableEventHandler trackingObject;
 
 	public LayerMask layer;
 
@@ -23,19 +22,26 @@ public class MoveCubeManager : MonoBehaviour
 	public int markedCount = 0;
 	void Start()
 	{
-		trackingObject = MergeTutorial.ins.myTrackingSystem;
 		UpdateRotation();
 		SpawnMoveCubeCanvas();
 		LRController.isInMoveCubeTut = true;
 	}
 
 
+	void OnDrawGizmosSelected() 
+	{
+		Gizmos.color = Color.red;
+		Gizmos.DrawRay(Camera.main.transform.position, (MergeMultiTarget.instance.transform.position - Camera.main.transform.position) * 100f);
+	}
+
+
 	// Update is called once per frame
 	void Update()
 	{
-		if(markedCount < areaCount)
+		if(markedCount < areaCount && MergeMultiTarget.instance.isTracking)
 		{
-			if( Physics.Raycast(Camera.main.transform.position, (trackingObject.transform.position - Camera.main.transform.position) * 100f, out hit, 100f, layer))
+
+			if( Physics.Raycast(Camera.main.transform.position, (MergeMultiTarget.instance.transform.position - Camera.main.transform.position) * 100f, out hit, 100f, layer))
 			{
 				if(hit.collider.GetComponent<MoveCubeCanvas>())
 				{
@@ -53,7 +59,7 @@ public class MoveCubeManager : MonoBehaviour
 
 		if(LRController != null && LRController.TargetOnScreenFlag())
 		{
-			if (trackingObject.isTracking)
+			if (MergeMultiTarget.instance.isTracking)
 			{
 				LRController.EnableLine();
 			}
