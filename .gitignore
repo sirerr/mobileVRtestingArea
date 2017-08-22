@@ -23,6 +23,7 @@ Thumbs.db
 *.sbr
 
 /[Ll]ibrary/
+/daydreamdevarea/broken/unitycore1/clarity
 /[Tt]emp/
 /[Oo]bj/
 /[Bb]uild/
